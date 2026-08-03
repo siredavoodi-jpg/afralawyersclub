@@ -1,0 +1,209 @@
+// اسکیمای دیتابیس - باشگاه وکلای افرا
+// مطابق بخش ۸ (Database Schema) در MASTER_PROMPT.md
+// دیتابیس هدف: Supabase Postgres
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  guest
+  member
+  lawyer
+  admin
+}
+
+enum UserStatus {
+  active
+  inactive
+  suspended
+}
+
+enum VerificationStatus {
+  pending
+  verified
+  rejected
+}
+
+enum SubscriptionPlan {
+  free
+  plus
+  professional
+}
+
+enum SubscriptionStatus {
+  active
+  expired
+  cancelled
+}
+
+enum CourseLevel {
+  beginner
+  intermediate
+  advanced
+}
+
+enum CourseStatus {
+  draft
+  published
+  archived
+}
+
+enum AiServiceType {
+  case_analysis
+  petition
+  contract
+  chat
+}
+
+enum AiRequestStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model User {
+  id        String     @id @default(uuid())
+  phone     String     @unique
+  email     String?
+  name      String
+  role      UserRole   @default(guest)
+  status    UserStatus @default(active)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  lawyer        Lawyer?
+  subscriptions Subscription[]
+  aiRequests    AiRequest[]
+  enrollments   Enrollment[]
+  otpCodes      OtpCode[]
+
+  @@map("users")
+}
+
+model Lawyer {
+  id                 String              @id @default(uuid())
+  userId             String              @unique @map("user_id")
+  licenseNumber      String              @unique @map("license_number")
+  barAssociation     String              @map("bar_association")
+  licenseImage       String              @map("license_image")
+  verificationStatus VerificationStatus  @default(pending) @map("verification_status")
+  verifiedAt         DateTime?           @map("verified_at")
+  createdAt          DateTime            @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("lawyers")
+}
+
+model Subscription {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  plan      SubscriptionPlan    @default(free)
+  status    SubscriptionStatus  @default(active)
+  startDate DateTime            @map("start_date")
+  endDate   DateTime            @map("end_date")
+  autoRenew Boolean             @default(false) @map("auto_renew")
+  createdAt DateTime            @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Course {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  instructor  String
+  duration    Int // minutes
+  level       CourseLevel
+  price       Decimal      @default(0)
+  isFree      Boolean      @default(false) @map("is_free")
+  image       String?
+  status      CourseStatus @default(draft)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  courseId  String   @map("course_id")
+  title     String
+  order     Int
+  duration  Int // minutes
+  videoUrl  String?  @map("video_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  courseId  String   @map("course_id")
+  progress  Int      @default(0) // percent
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model AiRequest {
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  serviceType AiServiceType   @map("service_type")
+  inputData   Json            @map("input_data")
+  outputData  Json?           @map("output_data")
+  tokensUsed  Int             @default(0) @map("tokens_used")
+  cost        Decimal         @default(0)
+  status      AiRequestStatus @default(pending)
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_requests")
+}
+
+// جدول کمکی برای احراز هویت OTP (ارائه‌دهنده: mrotp.ir)
+model OtpCode {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  phone     String
+  code      String
+  consumed  Boolean  @default(false)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("otp_codes")
+}
+
+model Article {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  summary   String
+  content   String
+  image     String?
+  publishedAt DateTime @default(now()) @map("published_at")
+
+  @@map("articles")
+}
