@@ -4,7 +4,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import type { AiToolCard as AiToolCardType } from "@/types";
 
 export function AiToolCard({ tool }: { tool: AiToolCardType }) {
-  const Icon = (Icons as unknown as<string, Icons.LucideIcon>)[tool.icon] || Icons.Sparkles;
+  const Icon = (Icons as unknown as Record<string, Icons.LucideIcon>)[tool.icon] || Icons.Sparkles;
 
   return (
     <Card>
