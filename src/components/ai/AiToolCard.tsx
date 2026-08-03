@@ -1,10 +1,12 @@
 import Link from "next/link";
 import * as Icons from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import type { AiToolCard as AiToolCardType } from "@/types";
 
 export function AiToolCard({ tool }: { tool: AiToolCardType }) {
-  const Icon = (Icons as unknown as Record<string, Icons.LucideIcon>)[tool.icon] || Icons.Sparkles;
+  const Icon: LucideIcon =
+    (Icons[tool.icon as keyof typeof Icons] as LucideIcon) || Icons.Sparkles;
 
   return (
     <Card>
