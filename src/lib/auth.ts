@@ -7,10 +7,10 @@ export interface AuthTokenPayload {
 }
 
 const SECRET = process.env.JWT_SECRET as string;
-const EXPIRES_IN = process.env.JWT_EXPIRES_IN || "30d";
+const EXPIRES_IN_SECONDS = 30 * 24 * 60 * 60; // 30 روز بر حسب ثانیه
 
 export function signAuthToken(payload: AuthTokenPayload): string {
-  return jwt.sign(payload, SECRET, { expiresIn: EXPIRES_IN });
+  return jwt.sign(payload, SECRET, { expiresIn: EXPIRES_IN_SECONDS });
 }
 
 export function verifyAuthToken(token: string): AuthTokenPayload | null {
