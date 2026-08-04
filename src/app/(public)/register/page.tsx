@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { setAuthSession } from "@/lib/auth-client";
 
 export default function RegisterPage() {
-  const [step, setStep] = useState<"info" | "otp">("info");
+  const [step, setStep] = useState<"info" | "password" | "otp">("info");
   const [accountType, setAccountType] = useState<"member" | "lawyer">("member");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -16,16 +16,59 @@ export default function RegisterPage() {
   const [membershipType, setMembershipType] = useState<"bar_association" | "judiciary_center">("bar_association");
   const [licenseExpiry, setLicenseExpiry] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function submitInfo(e: React.FormEvent) {
+  async function validateInfoAndProceed(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
     if (!acceptedTerms) {
       setError("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.");
+      return;
+    }
+    
+    if (!/^\d{10}$/.test(nationalId)) {
+      setError("کد ملی باید ۱۰ رقم باشد.");
+      return;
+    }
+    
+    if (accountType === "lawyer") {
+      if (!licenseNumber || !membershipType || !licenseExpiry) {
+        setError("لطفاً تمامی اطلاعات مربوط به پروانه وکالت را تکمیل کنید.");
+        return;
+      }
+    }
+
+    setStep("password");
+  }
+
+  async function submitAllInfo(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    // اعتبارسنجی رمز عبور قوی
+    if (password.length < 8) {
+      setError("رمز عبور باید حداقل ۸ کاراکتر باشد.");
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError("رمز عبور باید شامل حداقل یک عدد باشد.");
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setError("رمز عبور باید شامل حداقل یک حرف کوچک انگلیسی باشد.");
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setError("رمز عبور باید شامل حداقل یک حرف بزرگ انگلیسی باشد.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("رمز عبور و تکرار آن مطابقت ندارند.");
       return;
     }
 
@@ -38,6 +81,7 @@ export default function RegisterPage() {
           name,
           phone,
           nationalId,
+          password,
           acceptedTerms,
           accountType,
           ...(accountType === "lawyer" && {
@@ -86,11 +130,13 @@ export default function RegisterPage() {
     <section className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12 sm:px-6">
       <h1 className="text-2xl font-bold text-neutral-900">ثبت‌نام رایگان</h1>
       <p className="mt-2 text-sm text-neutral-600">
-        {step === "info" ? "اطلاعات خود را وارد کنید" : "کد پیامک‌شده را وارد کنید"}
+        {step === "info" ? "اطلاعات خود را وارد کنید" : 
+         step === "password" ? "یک رمز عبور قوی انتخاب کنید" : 
+         "کد پیامک‌شده را وارد کنید"}
       </p>
 
       {step === "info" ? (
-        <form onSubmit={submitInfo} className="mt-8 flex flex-col gap-5">
+        <form onSubmit={validateInfoAndProceed} className="mt-8 flex flex-col gap-5">
           <div className="flex rounded-lg border border-neutral-300 p-1">
             <button
               type="button"
@@ -184,8 +230,39 @@ export default function RegisterPage() {
 
           {error && <p className="text-sm text-error">{error}</p>}
           <Button type="submit" size="lg" disabled={loading}>
-            {loading ? "در حال ثبت..." : "دریافت کد ورود"}
+            {loading ? "در حال بررسی..." : "مرحله بعد (تعیین رمز عبور)"}
           </Button>
+        </form>
+      ) : step === "password" ? (
+        <form onSubmit={submitAllInfo} className="mt-8 flex flex-col gap-5">
+          <Input
+            label="رمز عبور"
+            name="password"
+            type="password"
+            placeholder="حداقل ۸ کاراکتر شامل عدد و حروف کوچک و بزرگ"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Input
+            label="تکرار رمز عبور"
+            name="confirmPassword"
+            type="password"
+            placeholder="تکرار رمز عبور"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          
+          {error && <p className="text-sm text-error">{error}</p>}
+          <div className="flex gap-3">
+            <Button type="button" variant="ghost" size="lg" onClick={() => setStep("info")}>
+              بازگشت
+            </Button>
+            <Button type="submit" size="lg" disabled={loading} className="flex-1">
+              {loading ? "در حال ثبت..." : "ثبت‌نام و دریافت کد تایید"}
+            </Button>
+          </div>
         </form>
       ) : (
         <form onSubmit={verifyOtp} className="mt-8 flex flex-col gap-5">

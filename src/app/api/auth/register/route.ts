@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { generateOtpCode, sendOtpSms } from "@/lib/otp";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,7 @@ export async function POST(req: NextRequest) {
       phone,
       name,
       nationalId,
+      password,
       acceptedTerms,
       accountType,
       license_number,
@@ -15,8 +17,22 @@ export async function POST(req: NextRequest) {
       license_expiry,
     } = await req.json();
 
-    if (!phone || !name || !nationalId) {
-      return NextResponse.json({ error: "نام، شماره موبایل و کد ملی الزامی هستند" }, { status: 400 });
+    if (!phone || !name || !nationalId || !password) {
+      return NextResponse.json({ error: "نام، شماره موبایل، کد ملی و رمز عبور الزامی هستند" }, { status: 400 });
+    }
+
+    // اعتبارسنجی رمز عبور قوی (سمت سرور)
+    if (password.length < 8) {
+      return NextResponse.json({ error: "رمز عبور باید حداقل ۸ کاراکتر باشد" }, { status: 400 });
+    }
+    if (!/[0-9]/.test(password)) {
+      return NextResponse.json({ error: "رمز عبور باید شامل حداقل یک عدد باشد" }, { status: 400 });
+    }
+    if (!/[a-z]/.test(password)) {
+      return NextResponse.json({ error: "رمز عبور باید شامل حداقل یک حرف کوچک انگلیسی باشد" }, { status: 400 });
+    }
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json({ error: "رمز عبور باید شامل حداقل یک حرف بزرگ انگلیسی باشد" }, { status: 400 });
     }
 
     if (!acceptedTerms) {
@@ -44,10 +60,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "این کد ملی قبلاً ثبت شده است" }, { status: 409 });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.upsert({
       where: { phone },
-      update: { name, nationalId },
-      create: { phone, name, nationalId, role: "member" },
+      update: { name, nationalId, password: hashedPassword },
+      create: { phone, name, nationalId, password: hashedPassword, role: "member" },
     });
 
     if (accountType === "lawyer") {
@@ -83,6 +101,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: { id: user.id, phone: user.phone }, message: "کد تایید ارسال شد" });
   } catch (err) {
+    console.error("Register error:", err);
     return NextResponse.json({ error: "خطای داخلی سرور" }, { status: 500 });
   }
 }

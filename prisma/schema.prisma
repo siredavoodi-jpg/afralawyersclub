@@ -74,16 +74,28 @@ enum AiRequestStatus {
   failed
 }
 
+enum Gender {
+  male
+  female
+}
+
 model User {
-  id         String     @id @default(uuid())
-  phone      String     @unique
-  email      String?
-  name       String
-  nationalId String?    @unique @map("national_id")
-  role       UserRole   @default(guest)
-  status     UserStatus @default(active)
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
+  id                    String     @id @default(uuid())
+  phone                 String     @unique
+  email                 String?
+  name                  String
+  nationalId            String?    @unique @map("national_id")
+  password   String?
+ passwordHash          String?    @map("password_hash")
+  gender                Gender?
+  legalInterests        String[]   @default([]) @map("legal_interests")
+  legalInterestOther     String?    @map("legal_interest_other")
+  afraCollaboration     String[]   @default([]) @map("afra_collaboration")
+  afraCollaborationOther String?   @map("afra_collaboration_other")
+  role                  UserRole   @default(guest)
+  status                UserStatus @default(active)
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
 
   lawyer        Lawyer?
   subscriptions Subscription[]
@@ -93,7 +105,6 @@ model User {
 
   @@map("users")
 }
-
 model Lawyer {
   id                 String               @id @default(uuid())
   userId             String               @unique @map("user_id")
