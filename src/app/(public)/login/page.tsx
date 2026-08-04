@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { setAuthSession } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -17,7 +18,6 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      // این درخواست کد OTP را از طریق /api/auth/register یا یک endpoint اختصاصی ارسال OTP صادر می‌کند
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,7 +42,10 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, otp }),
       });
+      const data = await res.json();
       if (!res.ok) throw new Error();
+
+      setAuthSession(data.token, data.user);
       window.location.href = "/dashboard";
     } catch {
       setError("کد وارد شده صحیح نیست.");
