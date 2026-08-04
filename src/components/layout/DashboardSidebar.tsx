@@ -25,6 +25,7 @@ import {
 const memberLinks = [
   { href: "/dashboard", label: "داشبورد", icon: LayoutDashboard },
   { href: "/dashboard/profile", label: "پروفایل", icon: User },
+  { href: "/dashboard/become-lawyer", label: "درخواست وکیل شدن", icon: BadgeCheck },
   { href: "/dashboard/subscription", label: "اشتراک", icon: CreditCard },
   { href: "/dashboard/courses", label: "دوره‌های من", icon: BookOpen },
   { href: "/dashboard/downloads", label: "دانلودها", icon: Download },
