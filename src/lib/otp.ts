@@ -1,48 +1,64 @@
 /**
- * رابط سرویس OTP - mrotp.ir
- *
- * این فایل یک wrapper نازک روی API سرویس mrotp.ir است.
- * چون ساختار دقیق endpoint و پارامترهای mrotp.ir در این سند مشخص نشده،
- * توابع زیر را با مستندات رسمی حساب خودتان در mrotp.ir تطبیق دهید
- * (معمولاً این سرویس‌ها یک endpoint برای ارسال کد و یک endpoint/کد پیش‌فرض دارند).
- *
- * TODO: مقادیر MROTP_API_KEY / MROTP_BASE_URL / MROTP_SENDER_LINE را
- * در .env از پنل mrotp.ir بردارید و اینجا مطابق مستندات API آن‌ها
- * مسیر و بدنه‌ی درخواست را نهایی کنید.
+ * سرویس OTP — mrotp.ir
+ * مستندات: https://mrotp.ir/USSD-OTP-help
+ * با جریان فعلی auth (تولید کد سمت ما + ذخیره در otp_codes) سازگار است.
  */
 
-const BASE_URL = process.env.MROTP_BASE_URL || "https://api.mrotp.ir";
+const BASE_URL = "https://my.mrotp.ir/api/OTP/v1";
 const API_KEY = process.env.MROTP_API_KEY;
 
 export function generateOtpCode(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  return String(Math.floor(10000 + Math.random() * 90000)); // ۵ رقم
 }
 
-export async function sendOtpSms(phone: string, code: string): Promise<{ ok: boolean; error?: string }> {
+function normalizePhone(phone: string): string {
+  const cleaned = phone.replace(/\D/g, "");
+  if (cleaned.startsWith("98") && cleaned.length === 12) return "0" + cleaned.slice(2);
+  if (cleaned.startsWith("9") && cleaned.length === 10) return "0" + cleaned;
+  return cleaned;
+}
+
+/**
+ * ثبت و ارسال کد تولید‌شده توسط ما روی mrotp (تابع setOTP)
+ */
+export async function sendOtpSms(
+  phone: string,
+  code: string
+): Promise<{ ok: boolean; error?: string }> {
   if (!API_KEY) {
-    console.warn("[otp] MROTP_API_KEY تنظیم نشده — کد فقط در لاگ نمایش داده می‌شود:", code);
+    console.warn("[otp] MROTP_API_KEY تنظیم نشده — کد توسعه:", code);
     return { ok: true };
   }
 
+  const mobile = normalizePhone(phone);
+  if (!/^09\d{9}$/.test(mobile)) {
+    return { ok: false, error: "شماره موبایل معتبر نیست" };
+  }
+
   try {
-    // TODO: این بخش را مطابق مستندات دقیق API مربوط به اکانت mrotp.ir شما تنظیم کنید.
-    const res = await fetch(`${BASE_URL}/v1/send`, {
+    const form = new FormData();
+    form.append("apiKey", API_KEY);
+    form.append("mobile", mobile);
+    form.append("OTP", code);
+    form.append("validTime", "5"); // ۵ دقیقه
+    form.append("type", "SMS"); // یا "USSD"
+
+    const res = await fetch(`${BASE_URL}/setOTP`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        receptor: phone,
-        code,
-        sender: process.env.MROTP_SENDER_LINE,
-      }),
+      body: form,
     });
 
-    if (!res.ok) {
-      return { ok: false, error: `mrotp respond with status ${res.status}` };
+    const data = await res.json();
+
+    // موفقیت: code > 100
+    if (data.code && Number(data.code) > 100) {
+      return { ok: true };
     }
-    return { ok: true };
+
+    return {
+      ok: false,
+      error: data.message || `خطای mrotp: ${data.code ?? "unknown"}`,
+    };
   } catch (err) {
     return { ok: false, error: (err as Error).message };
   }
