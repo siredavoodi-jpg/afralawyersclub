@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { clearAuthSession } from "@/lib/auth-client";
@@ -18,7 +19,6 @@ import {
   Sparkles,
   FileStack,
   Receipt,
-  Scale,
   ShieldCheck,
 } from "lucide-react";
 
@@ -58,9 +58,13 @@ export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" | "
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-l border-neutral-100 bg-white lg:flex">
       <Link href="/" className="flex items-center gap-2 px-6 py-5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white">
-          <Scale size={18} aria-hidden />
-        </span>
+        <Image
+          src="/images/logo.jpg"
+          alt="لوگوی باشگاه وکلای افرا"
+          width={36}
+          height={36}
+          className="h-9 w-9 rounded-lg object-cover"
+        />
         <span className="font-fa text-base font-bold text-primary-700">باشگاه وکلای افرا</span>
       </Link>
 

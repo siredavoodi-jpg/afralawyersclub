@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, X, Scale } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { getAuthUser, type AuthUser } from "@/lib/auth-client";
 
@@ -11,6 +12,7 @@ const navLinks = [
   { href: "/courses", label: "دوره‌ها" },
   { href: "/services", label: "خدمات AI" },
   { href: "/library", label: "کتابخانه" },
+  { href: "/library/prompts", label: "بانک پرامپت", highlight: true },
   { href: "/about", label: "درباره ما" },
 ];
 
@@ -32,16 +34,28 @@ export function Navbar() {
     <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2" aria-label="باشگاه وکلای افرا - صفحه اصلی">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white">
-            <Scale size={18} aria-hidden />
-          </span>
+          <Image
+            src="/images/logo.jpg"
+            alt="لوگوی باشگاه وکلای افرا"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-lg object-cover"
+            priority
+          />
           <span className="font-fa text-lg font-bold text-primary-700">باشگاه وکلای افرا</span>
         </Link>
 
         <ul className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className="text-sm font-medium text-neutral-700 transition-fast hover:text-primary-600">
+              <Link
+                href={link.href}
+                className={
+                  "flex items-center gap-1 text-sm font-medium transition-fast hover:text-primary-600 " +
+                  (link.highlight ? "text-primary-600" : "text-neutral-700")
+                }
+              >
+                {link.highlight && <Sparkles size={14} aria-hidden className="text-accent-500" />}
                 {link.label}
               </Link>
             </li>
@@ -76,7 +90,15 @@ export function Navbar() {
           <ul className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="text-base font-medium text-neutral-700" onClick={() => setOpen(false)}>
+                <Link
+                  href={link.href}
+                  className={
+                    "flex items-center gap-2 text-base font-medium " +
+                    (link.highlight ? "text-primary-600" : "text-neutral-700")
+                  }
+                  onClick={() => setOpen(false)}
+                >
+                  {link.highlight && <Sparkles size={14} aria-hidden className="text-accent-500" />}
                   {link.label}
                 </Link>
               </li>

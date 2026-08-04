@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { GraduationCap, Sparkles, Users, Star } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -48,15 +49,21 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <ButtonLink href="/register" variant="secondary" size="lg">
-                شروع رایگان
+                پیوستن به افرا
               </ButtonLink>
               <ButtonLink href="/courses" variant="primary" size="lg">
                 مشاهده دوره‌ها
               </ButtonLink>
             </div>
           </div>
-          <div className="flex aspect-square items-center justify-center rounded-3xl bg-gradient-to-br from-primary-100 to-accent-50 lg:aspect-auto lg:h-96">
-            <span className="text-neutral-400">تصویر آواتار وکیل (جایگزین شود)</span>
+          <div className="relative aspect-square overflow-hidden rounded-3xl shadow-xl lg:aspect-auto lg:h-96">
+            <Image
+              src="/images/hero.jpg"
+              alt="وکلای باشگاه افرا در حال کار با دستیار هوش مصنوعی"
+              fill
+              priority
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
@@ -135,7 +142,7 @@ export default function HomePage() {
                     <Star key={i} size={16} className="fill-secondary-500" aria-hidden />
                   ))}
                 </div>
-                <p className="text-sm leading-relaxed text-neutral-700">«{t.quote}»</p>
+                <p className="text-sm leading-relaxed text-neutral-700">«{t.quote}</p>
                 <div>
                   <p className="text-sm font-bold text-neutral-900">{t.name}</p>
                   <p className="text-xs text-neutral-500">{t.role}</p>
@@ -152,7 +159,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-white">همین حالا به جمع وکلای هوشمند بپیوندید</h2>
           <div className="mt-8">
             <ButtonLink href="/register" variant="secondary" size="lg">
-              ثبت‌نام رایگان
+              پیوستن به افرا
             </ButtonLink>
           </div>
         </div>

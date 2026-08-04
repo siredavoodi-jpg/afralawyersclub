@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const columns = [
   {
@@ -32,7 +33,16 @@ export function Footer() {
     <footer className="border-t border-neutral-100 bg-neutral-900 text-neutral-300">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
         <div>
-          <p className="font-fa text-lg font-bold text-white">باشگاه وکلای افرا</p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/logo.jpg"
+              alt="لوگوی باشگاه وکلای افرا"
+              width={48}
+              height={48}
+              className="rounded-xl"
+            />
+            <p className="font-fa text-lg font-bold text-white">باشگاه وکلای افرا</p>
+          </div>
           <p className="mt-3 text-sm leading-relaxed text-neutral-400">
             پلتفرم تخصصی آموزش هوش مصنوعی به وکلا و ارائه خدمات حقوقی مبتنی بر AI.
           </p>
