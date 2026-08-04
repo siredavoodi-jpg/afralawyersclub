@@ -1,14 +1,8 @@
-/**
- * سرویس OTP — mrotp.ir
- * مستندات: https://mrotp.ir/USSD-OTP-help
- * با جریان فعلی auth (تولید کد سمت ما + ذخیره در otp_codes) سازگار است.
- */
-
 const BASE_URL = "https://my.mrotp.ir/api/OTP/v1";
 const API_KEY = process.env.MROTP_API_KEY;
 
 export function generateOtpCode(): string {
-  return String(Math.floor(10000 + Math.random() * 90000)); // ۵ رقم
+  return String(Math.floor(10000 + Math.random() * 90000));
 }
 
 function normalizePhone(phone: string): string {
@@ -18,15 +12,12 @@ function normalizePhone(phone: string): string {
   return cleaned;
 }
 
-/**
- * ثبت و ارسال کد تولید‌شده توسط ما روی mrotp (تابع setOTP)
- */
 export async function sendOtpSms(
   phone: string,
   code: string
 ): Promise<{ ok: boolean; error?: string }> {
   if (!API_KEY) {
-    console.warn("[otp] MROTP_API_KEY تنظیم نشده — کد توسعه:", code);
+    console.warn("[otp] MROTP_API_KEY missing — dev code:", code);
     return { ok: true };
   }
 
@@ -36,28 +27,37 @@ export async function sendOtpSms(
   }
 
   try {
-    const form = new FormData();
-    form.append("apiKey", API_KEY);
-    form.append("mobile", mobile);
-    form.append("OTP", code);
-    form.append("validTime", "5"); // ۵ دقیقه
-    form.append("type", "SMS"); // یا "USSD"
+    const body = new URLSearchParams({
+      apiKey: API_KEY,
+      mobile,
+      OTP: code,
+      validTime: "5",
+      type: "SMS",
+    });
 
     const res = await fetch(`${BASE_URL}/setOTP`, {
       method: "POST",
-      body: form,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data: any = {};
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return { ok: false, error: `پاسخ نامعتبر mrotp: ${text.slice(0, 200)}` };
+    }
 
-    // موفقیت: code > 100
+    console.log("[otp] mrotp:", data);
+
     if (data.code && Number(data.code) > 100) {
       return { ok: true };
     }
 
     return {
       ok: false,
-      error: data.message || `خطای mrotp: ${data.code ?? "unknown"}`,
+      error: data.message || `خطای mrotp code=${data.code ?? "?"}`,
     };
   } catch (err) {
     return { ok: false, error: (err as Error).message };
