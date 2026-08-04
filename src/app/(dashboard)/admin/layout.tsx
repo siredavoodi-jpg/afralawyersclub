@@ -1,0 +1,15 @@
+"use client";
+
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { RequireRole } from "@/components/auth/RequireRole";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <RequireRole allowedRoles={["admin"]} redirectTo="/dashboard">
+      <div className="flex min-h-screen bg-neutral-50">
+        <DashboardSidebar variant="admin" />
+        <main className="flex-1 px-4 py-8 sm:px-6 lg:px-10">{children}</main>
+      </div>
+    </RequireRole>
+  );
+}

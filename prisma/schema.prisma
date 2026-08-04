@@ -31,6 +31,11 @@ enum VerificationStatus {
   rejected
 }
 
+enum LawyerMembershipType {
+  bar_association
+  judiciary_center
+}
+
 enum SubscriptionPlan {
   free
   plus
@@ -70,14 +75,15 @@ enum AiRequestStatus {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  phone     String     @unique
-  email     String?
-  name      String
-  role      UserRole   @default(guest)
-  status    UserStatus @default(active)
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id         String     @id @default(uuid())
+  phone      String     @unique
+  email      String?
+  name       String
+  nationalId String?    @unique @map("national_id")
+  role       UserRole   @default(guest)
+  status     UserStatus @default(active)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 
   lawyer        Lawyer?
   subscriptions Subscription[]
@@ -89,14 +95,14 @@ model User {
 }
 
 model Lawyer {
-  id                 String              @id @default(uuid())
-  userId             String              @unique @map("user_id")
-  licenseNumber      String              @unique @map("license_number")
-  barAssociation     String              @map("bar_association")
-  licenseImage       String              @map("license_image")
-  verificationStatus VerificationStatus  @default(pending) @map("verification_status")
-  verifiedAt         DateTime?           @map("verified_at")
-  createdAt          DateTime            @default(now()) @map("created_at")
+  id                 String               @id @default(uuid())
+  userId             String               @unique @map("user_id")
+  licenseNumber      String               @unique @map("license_number")
+  membershipType     LawyerMembershipType @map("membership_type")
+  licenseExpiry      DateTime             @map("license_expiry")
+  verificationStatus VerificationStatus   @default(pending) @map("verification_status")
+  verifiedAt         DateTime?            @map("verified_at")
+  createdAt          DateTime             @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -19,6 +19,7 @@ import {
   FileStack,
   Receipt,
   Scale,
+  ShieldCheck,
 } from "lucide-react";
 
 const memberLinks = [
@@ -41,10 +42,12 @@ const lawyerLinks = [
   { href: "/lawyer/billing", label: "صورتحساب", icon: Receipt },
 ];
 
-export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" }) {
+const adminLinks = [{ href: "/admin/lawyers", label: "تایید وکلا", icon: ShieldCheck }];
+
+export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" | "admin" }) {
   const pathname = usePathname();
   const router = useRouter();
-  const links = variant === "member" ? memberLinks : lawyerLinks;
+  const links = variant === "member" ? memberLinks : variant === "lawyer" ? lawyerLinks : adminLinks;
 
   function handleLogout() {
     clearAuthSession();
@@ -71,9 +74,7 @@ export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" }) 
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-fast",
-                active
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                active ? "bg-primary-50 text-primary-700" : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
               )}
             >
               <Icon size={18} aria-hidden />
