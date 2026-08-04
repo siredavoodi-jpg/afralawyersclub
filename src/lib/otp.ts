@@ -1,7 +1,6 @@
 /**
  * سرویس OTP — mrotp.ir
- * مستندات: https://mrotp.ir/USSD-OTP-help
- * با جریان فعلی auth (تولید کد سمت ما + ذخیره در otp_codes) سازگار است.
+ * با جریان فعلی auth سازگار است (کد سمت ما تولید و در otp_codes ذخیره می‌شود)
  */
 
 const BASE_URL = "https://my.mrotp.ir/api/OTP/v1";
@@ -18,9 +17,6 @@ function normalizePhone(phone: string): string {
   return cleaned;
 }
 
-/**
- * ثبت و ارسال کد تولید‌شده توسط ما روی mrotp (تابع setOTP)
- */
 export async function sendOtpSms(
   phone: string,
   code: string
@@ -40,8 +36,8 @@ export async function sendOtpSms(
     form.append("apiKey", API_KEY);
     form.append("mobile", mobile);
     form.append("OTP", code);
-    form.append("validTime", "5"); // ۵ دقیقه
-    form.append("type", "SMS"); // یا "USSD"
+    form.append("validTime", "5");
+    form.append("type", "SMS");
 
     const res = await fetch(`${BASE_URL}/setOTP`, {
       method: "POST",
@@ -50,7 +46,6 @@ export async function sendOtpSms(
 
     const data = await res.json();
 
-    // موفقیت: code > 100
     if (data.code && Number(data.code) > 100) {
       return { ok: true };
     }
