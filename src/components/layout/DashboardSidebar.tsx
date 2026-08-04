@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { clearAuthSession } from "@/lib/auth-client";
 import {
   LayoutDashboard,
   User,
@@ -42,7 +43,13 @@ const lawyerLinks = [
 
 export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" }) {
   const pathname = usePathname();
+  const router = useRouter();
   const links = variant === "member" ? memberLinks : lawyerLinks;
+
+  function handleLogout() {
+    clearAuthSession();
+    router.replace("/login");
+  }
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-l border-neutral-100 bg-white lg:flex">
@@ -77,6 +84,7 @@ export function DashboardSidebar({ variant }: { variant: "member" | "lawyer" }) 
       </nav>
 
       <button
+        onClick={handleLogout}
         className="mx-3 mb-5 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-error hover:bg-red-50"
         aria-label="خروج از حساب کاربری"
       >

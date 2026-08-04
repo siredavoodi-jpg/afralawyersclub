@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { setAuthSession } from "@/lib/auth-client";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"info" | "otp">("info");
@@ -42,7 +43,10 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, otp }),
       });
+      const data = await res.json();
       if (!res.ok) throw new Error();
+
+      setAuthSession(data.token, data.user);
       window.location.href = "/dashboard";
     } catch {
       setError("کد وارد شده صحیح نیست.");
