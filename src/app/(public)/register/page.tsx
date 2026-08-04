@@ -14,25 +14,28 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function submitInfo(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone }),
-      });
-      if (!res.ok) throw new Error();
-      setStep("otp");
-    } catch {
-      setError("ثبت‌نام با خطا مواجه شد. دوباره تلاش کنید.");
-    } finally {
-      setLoading(false);
+ async function submitInfo(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error || "ثبت‌نام با خطا مواجه شد.");
+      return;
     }
+    setStep("otp");
+  } catch {
+    setError("ارتباط با سرور برقرار نشد.");
+  } finally {
+    setLoading(false);
   }
-
+}
   async function verifyOtp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
