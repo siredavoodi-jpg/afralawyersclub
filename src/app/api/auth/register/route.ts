@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { generateOtpCode, sendOtpSms } from "@/lib/otp";
 
-// POST /api/auth/register
-// body: { phone: string, name: string }
-// در قدم اول کاربر را (اگر وجود ندارد) با نقش member می‌سازد و یک کد OTP ارسال می‌کند.
-// تایید نهایی و صدور توکن در /api/auth/login انجام می‌شود.
 export async function POST(req: NextRequest) {
   try {
     const { phone, name } = await req.json();
@@ -21,7 +17,7 @@ export async function POST(req: NextRequest) {
     });
 
     const code = generateOtpCode();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // ۵ دقیقه اعتبار
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     await prisma.otpCode.create({
       data: { userId: user.id, phone, code, expiresAt },
@@ -29,11 +25,21 @@ export async function POST(req: NextRequest) {
 
     const otpResult = await sendOtpSms(phone, code);
     if (!otpResult.ok) {
-      return NextResponse.json({ error: "ارسال پیامک OTP ناموفق بود" }, { status: 502 });
+      return NextResponse.json(
+        { error: otpResult.error || "ارسال پیامک OTP ناموفق بود" },
+        { status: 502 }
+      );
     }
 
-    return NextResponse.json({ user: { id: user.id, phone: user.name }, message: "کد تایید ارسال شد" });
+    return NextResponse.json({
+      user: { id: user.id, phone: user.phone, name: user.name },
+      message: "کد تایید ارسال شد",
+    });
   } catch (err) {
-    return NextResponse.json({ error: "خطای داخلی سرور" }, { status: 500 });
+    console.error("[register]", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "خطای داخلی سرور" },
+      { status: 500 }
+    );
   }
 }
