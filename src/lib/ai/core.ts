@@ -1,13 +1,13 @@
 /**
- * هسته مشترک سرویس‌های هوش مصنوعی (بخش ۷.۱ در MASTER_PROMPT.md)
- *
- * طبق تصمیم پروژه: طراحی/معماری این لایه اینجا پیاده شده،
- * و اتصال واقعی به مدل (کلید API، انتخاب provider) توسط شما تکمیل می‌شود.
- * محل دقیق که باید کد را جایگزین کنید با «TODO» مشخص شده.
+ * هسته مشترک سرویس‌های هوش مصنوعی
+ * اتصال واقعی به مدل از طریق Groq انجام می‌شود.
  */
 
 import { prisma } from "@/lib/db/prisma";
 import type { AiServiceType } from "@prisma/client";
+import Groq from "groq-sdk";
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export const SYSTEM_PROMPTS: Record<AiServiceType, string> = {
   case_analysis: `You are an expert legal AI assistant specializing in Iranian law.
@@ -47,9 +47,9 @@ interface RunAiServiceParams {
 
 /**
  * تابع واحد اجرای هر سرویس AI:
- * ۱) یک رکورد AiRequest با status=pending می‌سازد (برای Logging/Analytics — بخش ۷.۱)
- * ۲) TODO: مدل را صدا می‌زند (OpenAI/Azure OpenAI/...)
- * ۳) نتیجه و تعداد توکن مصرفی را روی همان رکورد ثبت می‌کند
+ * 1) یک رکورد AiRequest با status=pending ساخته می‌شود
+ * 2) درخواست به مدل Groq ارسال می‌شود
+ * 3) نتیجه و تعداد توکن مصرفی روی همان رکورد ذخیره می‌شود
  */
 export async function runAiService({ userId, serviceType, input }: RunAiServiceParams) {
   const request = await prisma.aiRequest.create({
@@ -62,24 +62,18 @@ export async function runAiService({ userId, serviceType, input }: RunAiServiceP
   });
 
   try {
-    // ------------------------------------------------------------------
-    // TODO: اتصال واقعی به مدل را اینجا اضافه کنید. مثال با OpenAI SDK:
-    //
-    //   import OpenAI from "openai";
-    //   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    //   const completion = await openai.chat.completions.create({
-    //     model: process.env.OPENAI_MODEL || "gpt-4o",
-    //     messages: [
-    //       { role: "system", content: SYSTEM_PROMPTS[serviceType] },
-    //       { role: "user", content: JSON.stringify(input) },
-    //     ],
-    //   });
-    //   const output = completion.choices[0].message.content;
-    //   const tokensUsed = completion.usage?.total_tokens ?? 0;
-    // ------------------------------------------------------------------
+    const completion = await groq.chat.completions.create({
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPTS[serviceType] },
+        { role: "user", content: JSON.stringify(input) },
+      ],
+    });
 
-    const output = { note: "خروجی نمونه — TODO: جایگزین با پاسخ واقعی مدل", input };
-    const tokensUsed = 0;
+    const outputText = completion.choices[0]?.message?.content ?? "";
+    const tokensUsed = completion.usage?.total_tokens ?? 0;
+
+    const output = { result: outputText };
 
     const updated = await prisma.aiRequest.update({
       where: { id: request.id },
