@@ -2,7 +2,6 @@
  * سرویس OTP — mrotp.ir
  * مستندات: https://mrotp.ir/USSD-OTP-help
  */
-
 const BASE_URL = "https://my.mrotp.ir/api/OTP/v1";
 const API_KEY = process.env.MROTP_API_KEY;
 

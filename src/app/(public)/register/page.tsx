@@ -54,7 +54,7 @@ export default function RegisterPage() {
       }
       setStep("otp");
     } catch {
-      setError("ثبت‌نام با خطا مواجه شد. دوباره تلاش کنید.");
+      setError("ارتباط با سرور برقرار نشد.");
     } finally {
       setLoading(false);
     }
