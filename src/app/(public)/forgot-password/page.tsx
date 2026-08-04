@@ -81,7 +81,7 @@ export default function ForgotPasswordPage() {
     }
   }
 
-  // مرحله ۳: تنظیم رمز جدید
+  // مرحله ۳: تنظیم رمز جدید (نام تابع اصلاح شد)
   async function submitNewPassword(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -196,7 +196,7 @@ export default function ForgotPasswordPage() {
             </form>
           )}
 
-           {step === "newPassword" && (
+          {step === "newPassword" && (
             <form onSubmit={submitNewPassword} className="flex flex-col gap-5">
               <Input
                 label="رمز عبور جدید"
