@@ -224,3 +224,47 @@ model Article {
 
   @@map("articles")
 }
+
+// ─────────────────────────────────────────────
+// افرا مارکت (Afra Market) — MVP
+// ─────────────────────────────────────────────
+
+model MarketCategory {
+  id        String           @id @default(cuid())
+  name      String           @unique
+  slug      String           @unique
+  icon      String?
+  parentId  String?
+  parent    MarketCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  MarketCategory[] @relation("CategoryTree")
+  listings  MarketListing[]
+  createdAt DateTime         @default(now())
+}
+
+model MarketListing {
+  id          String               @id @default(cuid())
+  title       String
+  description String
+  price       Int?
+  negotiable  Boolean              @default(false)
+  condition   String?
+  province    String?
+  city        String?
+  phone       String?
+  status      String               @default("pending")
+  views       Int                  @default(0)
+  categoryId  String
+  sellerId    String
+  category    MarketCategory       @relation(fields: [categoryId], references: [id])
+  images      MarketListingImage[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+model MarketListingImage {
+  id        String        @id @default(cuid())
+  url       String
+  sortOrder Int           @default(0)
+  listingId String
+  listing   MarketListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}

@@ -1,11 +1,12 @@
 import type { Course } from "./types";
 import chapter01 from "./chapter-01";
+import chapter02 from "./chapter-02";
 
 export const course: Course = {
   id: "ai-for-lawyers",
   title: "هوش مصنوعی برای وکلا",
   description: "دوره جامع مقدماتی هوش مصنوعی، ویژه جامعه وکالت",
-  chapters: [chapter01],
+  chapters: [chapter01, chapter02],
 };
 
 export function getChapter(id: number) {

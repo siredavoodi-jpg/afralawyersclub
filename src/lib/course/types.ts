@@ -8,6 +8,23 @@ export interface GlossaryItem {
   definition: string;
 }
 
+export interface ProsCons {
+  pros: string[];
+  cons: string[];
+}
+
+export interface ComparisonTable {
+  title: string;
+  headers: string[];
+  rows: string[][];
+}
+
+export interface LessonSource {
+  url: string;
+  title: string;
+  description: string;
+}
+
 export interface Lesson {
   id: number;
   chapter: number;
@@ -26,12 +43,17 @@ export interface Lesson {
   summary?: string[];
   keywords?: string[];
   glossary?: GlossaryItem[];
+  prosCons?: ProsCons;
+  comparisonTable?: ComparisonTable;
+  sources?: LessonSource[];
+  lastUpdated?: string;
+  informationCurrencyNote?: string;
 }
 
 export interface QuizQuestion {
   q: string;
   options: string[];
-  correct: number; // index of correct option (0-based)
+  correct: number;
 }
 
 export interface Chapter {
@@ -41,7 +63,8 @@ export interface Chapter {
   lessons: Lesson[];
   quiz: QuizQuestion[];
   isActive: boolean;
-  isFree: boolean; // true for chapter 1, false for 2-12
+  isFree: boolean;
+  quizPassThreshold?: number;
 }
 
 export interface Course {
@@ -50,24 +73,4 @@ export interface Course {
   description: string;
   chapters: Chapter[];
   finalExam?: QuizQuestion[];
-}
-
-export interface CourseProgress {
-  lessonId: number;
-  completed: boolean;
-  completedAt?: Date;
-}
-
-export interface QuizResult {
-  chapterId?: number; // null for final exam
-  score: number; // 0-100
-  passed: boolean;
-  answers: Record<number, number>; // questionIndex -> selectedOptionIndex
-  completedAt: Date;
-}
-
-export interface LessonNote {
-  lessonId: number;
-  content: string;
-  updatedAt: Date;
 }
