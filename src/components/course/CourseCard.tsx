@@ -38,9 +38,9 @@ export function CourseCard({ course }: { course: Course }) {
 
         <p className="text-sm text-neutral-600">مدرس: {course.instructor}</p>
 
-        <Badge tone="neutral" className="w-fit">
-          {levelLabel[course.level]}
-        </Badge>
+        <div className="w-fit">
+          <Badge tone="neutral">{levelLabel[course.level]}</Badge>
+        </div>
 
         <div className="flex items-center gap-4 text-sm text-neutral-500">
           <span className="flex items-center gap-1">
