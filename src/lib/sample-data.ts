@@ -12,6 +12,7 @@ export const sampleCourses: Course[] = [
     level: "beginner",
     price: 0,
     isFree: true,
+    accessLevel: "interested", // 🆕 دسترسی برای علاقمندان
     rating: 4.8,
     studentsCount: 1240,
   },
@@ -24,6 +25,7 @@ export const sampleCourses: Course[] = [
     level: "intermediate",
     price: 890000,
     isFree: false,
+    accessLevel: "users", // 🆕 دسترسی برای کاربران
     rating: 4.6,
     studentsCount: 860,
   },
@@ -36,6 +38,7 @@ export const sampleCourses: Course[] = [
     level: "advanced",
     price: 1290000,
     isFree: false,
+    accessLevel: "lawyers", // 🆕 دسترسی برای وکلای عضو باشگاه
     rating: 4.9,
     studentsCount: 540,
   },
@@ -48,6 +51,7 @@ export const sampleCourses: Course[] = [
     level: "intermediate",
     price: 690000,
     isFree: false,
+    accessLevel: "lawyers", // 🆕 دسترسی برای وکلای عضو باشگاه
     rating: 4.5,
     studentsCount: 410,
   },
@@ -60,6 +64,7 @@ export const sampleCourses: Course[] = [
     level: "beginner",
     price: 0,
     isFree: true,
+    accessLevel: "interested", // 🆕 دسترسی برای علاقمندان
     rating: 4.7,
     studentsCount: 980,
   },
@@ -72,6 +77,7 @@ export const sampleCourses: Course[] = [
     level: "beginner",
     price: 0,
     isFree: true,
+    accessLevel: "users", // 🆕 دسترسی برای کاربران
     rating: 4.4,
     studentsCount: 720,
   },

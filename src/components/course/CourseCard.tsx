@@ -10,6 +10,18 @@ const levelLabel: Record<Course["level"], string> = {
   advanced: "پیشرفته",
 };
 
+const accessLevelLabel: Record<Course["accessLevel"], string> = {
+  interested: "برای علاقمندان",
+  users: "برای کاربران",
+  lawyers: "برای وکلای عضو باشگاه",
+};
+
+const accessLevelTone: Record<Course["accessLevel"], "accent" | "secondary" | "neutral"> = {
+  interested: "accent",
+  users: "secondary",
+  lawyers: "neutral",
+};
+
 export function CourseCard({ course }: { course: Course }) {
   return (
     <Card className="flex flex-col overflow-hidden">
@@ -18,15 +30,13 @@ export function CourseCard({ course }: { course: Course }) {
       </div>
       <CardBody className="flex flex-1 flex-col gap-3">
         <div className="flex items-center gap-2">
-          <Badge tone={course.isFree ? "accent" : "secondary"}>
-            {course.isFree ? "رایگان" : "پولی"}
+          <Badge tone={accessLevelTone[course.accessLevel]}>
+            {accessLevelLabel[course.accessLevel]}
           </Badge>
           <Badge tone="neutral">{levelLabel[course.level]}</Badge>
         </div>
-
         <h3 className="text-lg font-bold text-neutral-900">{course.title}</h3>
         <p className="text-sm text-neutral-600">مدرس: {course.instructor}</p>
-
         <div className="flex items-center gap-4 text-sm text-neutral-500">
           <span className="flex items-center gap-1">
             <Clock size={16} aria-hidden />
@@ -39,7 +49,6 @@ export function CourseCard({ course }: { course: Course }) {
             </span>
           )}
         </div>
-
         <div className="mt-auto flex items-center justify-between pt-2">
           <span className="font-bold text-secondary-600">
             {course.isFree ? "رایگان" : `${course.price.toLocaleString("fa-IR")} تومان`}

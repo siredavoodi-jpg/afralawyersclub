@@ -14,17 +14,19 @@ export default function CoursesPage() {
           <Link href="/courses" className="rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white">
             همه دوره‌ها
           </Link>
-          <Link href="/courses/free" className="rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
-            رایگان
+          <Link href="/courses/interested" className="rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
+            برای علاقمندان
           </Link>
-          <Link href="/courses/paid" className="rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
-            پولی
+          <Link href="/courses/users" className="rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
+            برای کاربران
+          </Link>
+          <Link href="/courses/lawyers" className="rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
+            برای وکلای عضو باشگاه
           </Link>
         </div>
-
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* کارت برجسته دوره هوش مصنوعی برای وکلا */}
-          <Link href="/courses/ai-for-lawyers" className="block sm:col-span-2 lg:col-span-3">
+          {/* کارت دوره آموزش مقدمات هوش مصنوعی - اندازه استاندارد */}
+          <Link href="/courses/ai-for-lawyers" className="block">
             <div className="flex flex-col items-center gap-6 rounded-2xl border-2 border-primary-200 bg-gradient-to-l from-primary-50 to-white p-6 transition-fast hover:border-primary-400 sm:flex-row">
               <Image
                 src="/images/avatar.png"
@@ -38,7 +40,7 @@ export default function CoursesPage() {
                   <span className="rounded-full bg-accent-50 px-3 py-1 text-xs font-medium text-accent-700">رایگان</span>
                   <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700">فصل اول منتشر شد</span>
                 </div>
-                <h3 className="mt-2 text-xl font-bold text-neutral-900">هوش مصنوعی برای وکلا</h3>
+                <h3 className="mt-2 text-xl font-bold text-neutral-900">آموزش مقدمات هوش مصنوعی</h3>
                 <p className="mt-1 text-sm leading-6 text-neutral-600">
                   دوره جامع مقدماتی هوش مصنوعی ویژه جامعه وکالت؛ فصل اول شامل ۵ درس رایگان، فصل‌های بعدی به‌زودی.
                 </p>
@@ -49,7 +51,6 @@ export default function CoursesPage() {
               </span>
             </div>
           </Link>
-
           {sampleCourses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
