@@ -15,7 +15,7 @@ const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => "۰۱۲۳۴
 const ICONS: Record<string, string> = {
   brain: "🧠", layers: "🗂", sparkles: "✦", "book-text": "📖",
   "graduation-cap": "🎓", cpu: "⚙", search: "🔎", scale: "⚖",
-  list: "📋", flag: "🏁",
+  list: "📋", flag: "🏁", zap: "⚡", "code-2": "💻", gavel: "⚖️",
 };
 
 function escapeRegExp(s: string) {
@@ -132,16 +132,14 @@ export default function LessonPage() {
         <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">⏱ {lesson.readingTime}</span>
         <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">سطح: {lesson.difficulty}</span>
       </div>
+
+      {/* یادداشت به‌روزرسانی اطلاعات */}
       {lesson.informationCurrencyNote && (
         <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-xs leading-6 text-neutral-600">
           🔄 {lesson.informationCurrencyNote}
         </div>
       )}
-      {lesson.informationCurrencyNote && (
-        <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-xs leading-6 text-neutral-600">
-          🔄 {lesson.informationCurrencyNote}
-        </div>
-      )}
+
       {lesson.objectives.length > 0 && (
         <div className="mt-6 rounded-lg border-r-4 border-primary-500 bg-primary-50 p-5">
           <h3 className="font-bold text-neutral-900">در پایان این درس می‌توانید:</h3>
@@ -198,6 +196,8 @@ export default function LessonPage() {
           </ul>
         </div>
       )}
+
+      {/* مزایا و معایب */}
       {lesson.prosCons && (
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="rounded-lg border-r-4 border-accent-500 bg-accent-50 p-5">
@@ -219,6 +219,7 @@ export default function LessonPage() {
         </div>
       )}
 
+      {/* جدول مقایسه ستاره‌ای */}
       {lesson.comparisonTable && (
         <div className="mt-8 overflow-hidden rounded-lg border border-neutral-200">
           <h3 className="border-b border-neutral-200 bg-primary-50 p-4 font-bold text-primary-800">{lesson.comparisonTable.title}</h3>
@@ -244,39 +245,7 @@ export default function LessonPage() {
           </div>
         </div>
       )}
-      {lesson.prosCons && (
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border-r-4 border-accent-500 bg-accent-50 p-5">
-            <h3 className="font-bold text-neutral-900">مزایا</h3>
-            <ul className="mt-3 flex flex-col gap-2">
-              {lesson.prosCons.pros.map((p, i) => (<li key={i} className="text-sm leading-7 text-neutral-700">{p}</li>))}
-            </ul>
-          </div>
-          <div className="rounded-lg border-r-4 border-error bg-red-50 p-5">
-            <h3 className="font-bold text-neutral-900">معایب</h3>
-            <ul className="mt-3 flex flex-col gap-2">
-              {lesson.prosCons.cons.map((c, i) => (<li key={i} className="text-sm leading-7 text-neutral-700">{c}</li>))}
-            </ul>
-          </div>
-        </div>
-      )}
 
-      {lesson.comparisonTable && (
-        <div className="mt-8 overflow-hidden rounded-lg border border-neutral-200">
-          <h3 className="border-b border-neutral-200 bg-primary-50 p-4 font-bold text-primary-800">{lesson.comparisonTable.title}</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-xs">
-              <thead>
-                <tr>{lesson.comparisonTable.headers.map((h, i) => (<th key={i} className="border border-neutral-200 bg-neutral-50 px-3 py-2 text-right font-bold text-neutral-800">{h}</th>))}</tr>
-              </thead>
-              <tbody>
-                {lesson.comparisonTable.rows.map((r, ri) => (<tr key={ri}>{r.map((c, ci) => (<td key={ci} className="border border-neutral-200 px-3 py-2 text-neutral-700">{c}</td>))}</tr>))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      {lesson.exercise && lesson.exercise.length > 0 && (
       {lesson.exercise && lesson.exercise.length > 0 && (
         <div className="mt-8 rounded-lg bg-neutral-900 p-6 text-white">
           <h3 className="font-bold text-secondary-300">✎ تمرین این درس</h3>
@@ -306,21 +275,8 @@ export default function LessonPage() {
           </ul>
         </div>
       )}
-      {lesson.sources && lesson.sources.length > 0 && (
-        <div className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-5">
-          <h3 className="font-bold text-neutral-900">📚 منابع و مطالعه بیشتر</h3>
-          <ul className="mt-3 flex flex-col gap-3">
-            {lesson.sources.map((s, i) => (
-              <li key={i}>
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-                  {s.title}
-                </a>
-                <p className="mt-0.5 text-xs leading-6 text-neutral-500">{s.description}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+
+      {/* منابع */}
       {lesson.sources && lesson.sources.length > 0 && (
         <div className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-5">
           <h3 className="font-bold text-neutral-900">📚 منابع و مطالعه بیشتر</h3>
@@ -334,7 +290,7 @@ export default function LessonPage() {
           </ul>
         </div>
       )}
-      {lesson.keywords && lesson.keywords.length > 0 && (
+
       {lesson.keywords && lesson.keywords.length > 0 && (
         <div className="mt-6 flex flex-wrap gap-2">
           {lesson.keywords.map((k) => (
