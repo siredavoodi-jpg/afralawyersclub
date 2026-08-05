@@ -33,8 +33,7 @@ export default function CourseLandingPage() {
               فصل اول رایگان + فصل دوم ویژه اعضا منتشر شد
             </span>
             <h1 className="text-3xl font-extrabold leading-tight text-neutral-900 sm:text-4xl">
-  آموزش مقدمات <span className="text-primary-600">هوش مصنوعی</span
-            </h1>
+              آموزش مقدمات <span className="text-primary-600">هوش مصنوعی</span>            </h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-neutral-600">
               {course.description}. بدون هیچ پیش‌زمینه فنی، فهم درستی از هوش مصنوعی و کاربرد آن در کار حقوقی پیدا کنید.
             </p>
