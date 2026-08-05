@@ -1,3 +1,6 @@
+export type AccessLevel = "interested" | "users" | "lawyers";
+export type CourseLevel = "beginner" | "intermediate" | "advanced";
+
 export interface Course {
   id: string;
   title: string;
@@ -7,13 +10,11 @@ export interface Course {
   level: CourseLevel;
   price: number;
   isFree: boolean;
-  accessLevel: "interested" | "users" | "lawyers"; // 🆕 فیلد جدید
+  accessLevel: AccessLevel; // 🆕 سطح دسترسی
   image?: string;
   rating?: number;
   studentsCount?: number;
 }
-
-export type CourseLevel = "beginner" | "intermediate" | "advanced";
 
 export interface Testimonial {
   id: string;
