@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { UserRole } from "@prisma/client"; // ✅ اضافه شدن import از prisma
+import { UserRole } from "@prisma/client"; // ✅ اضافه شده برای پشتیبانی از trainee
 
 export interface AuthTokenPayload {
   userId: string;
@@ -12,4 +12,20 @@ const EXPIRES_IN_SECONDS = 30 * 24 * 60 * 60; // 30 روز بر حسب ثانی�
 
 export function signAuthToken(payload: AuthTokenPayload): string {
   return jwt.sign(payload, SECRET, { expiresIn: EXPIRES_IN_SECONDS });
+}
+
+export function verifyAuthToken(token: string): AuthTokenPayload | null {
+  try {
+    return jwt.verify(token, SECRET) as AuthTokenPayload;
+  } catch {
+    return null;
+  }
+}
+
+// استخراج توکن از هدر Authorization: Bearer {token}
+export function getTokenFromHeader(authHeader: string | null): string | null {
+  if (!authHeader) return null;
+  const [scheme, token] = authHeader.split(" ");
+  if (scheme !== "Bearer" || !token) return null;
+  return token;
 }
