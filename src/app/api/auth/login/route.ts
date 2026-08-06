@@ -3,16 +3,13 @@ import { prisma } from "@/lib/db/prisma";
 import { signAuthToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
-// POST /api/auth/login
-// body: { phone: string, password: string }
-// ورود با موبایل و رمز عبور
 export async function POST(req: NextRequest) {
   try {
-    const { phone, password } = await req.json();
+    const { phone, password, otp } = await req.json();
 
-    if (!phone || !password) {
+    if (!phone) {
       return NextResponse.json(
-        { error: "شماره موبایل و رمز عبور الزامی هستند" },
+        { error: "شماره موبایل الزامی است" },
         { status: 400 }
       );
     }
@@ -35,37 +32,96 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // بررسی وجود رمز عبور (برای کاربران قدیمی)
-    if (!user.password) {
-      return NextResponse.json(
-        {
-          error: "PASSWORD_NOT_SET",
-          message: "شما هنوز رمز عبور تعیین نکرده‌اید. لطفاً از طریق صفحه بازیابی رمز عبور اقدام کنید.",
+    // حالت ۱: ورود با OTP (برای تایید ثبت‌نام یا ورود بدون رمز)
+    if (otp) {
+      const otpRecord = await prisma.otpCode.findFirst({
+        where: {
+          phone,
+          code: otp,
+          consumed: false,
+          expiresAt: { gt: new Date() },
         },
-        { status: 400 }
-      );
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (!otpRecord) {
+        return NextResponse.json(
+          { error: "کد تایید نامعتبر یا منقضی شده است" },
+          { status: 401 }
+        );
+      }
+
+      // مصرف کردن OTP
+      await prisma.otpCode.update({
+        where: { id: otpRecord.id },
+        data: { consumed: true },
+      });
+
+      // صدور توکن JWT
+      const token = signAuthToken({
+        userId: user.id,
+        phone: user.phone,
+        role: user.role,
+      });
+
+      return NextResponse.json({
+        user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
+        token,
+      });
     }
 
-    // بررسی صحت رمز عبور
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: "شماره موبایل یا رمز عبور اشتباه است" },
-        { status: 401 }
-      );
+    // حالت ۲: ورود با رمز عبور
+    if (password) {
+      // بررسی وجود رمز عبور
+      if (!user.password && !user.passwordHash) {
+        return NextResponse.json(
+          {
+            error: "شما هنوز رمز عبور تعیین نکرده‌اید. لطفاً از طریق صفحه بازیابی رمز عبور اقدام کنید.",
+            code: "PASSWORD_NOT_SET",
+          },
+          { status: 400 }
+        );
+      }
+
+      // بررسی رمز با password (bcrypt مستقیم)
+      if (user.password) {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          return NextResponse.json(
+            { error: "شماره موبایل یا رمز عبور اشتباه است" },
+            { status: 401 }
+          );
+        }
+      }
+      // بررسی رمز با passwordHash
+      else if (user.passwordHash) {
+        const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isPasswordValid) {
+          return NextResponse.json(
+            { error: "شماره موبایل یا رمز عبور اشتباه است" },
+            { status: 401 }
+          );
+        }
+      }
+
+      // صدور توکن JWT
+      const token = signAuthToken({
+        userId: user.id,
+        phone: user.phone,
+        role: user.role,
+      });
+
+      return NextResponse.json({
+        user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
+        token,
+      });
     }
 
-    // صدور توکن JWT
-    const token = signAuthToken({
-      userId: user.id,
-      phone: user.phone,
-      role: user.role,
-    });
-
-    return NextResponse.json({
-      user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
-      token,
-    });
+    // هیچکدام ارائه نشده
+    return NextResponse.json(
+      { error: "رمز عبور یا کد تایید الزامی است" },
+      { status: 400 }
+    );
   } catch (err) {
     console.error("Login error:", err);
     return NextResponse.json({ error: "خطای داخلی سرور" }, { status: 500 });

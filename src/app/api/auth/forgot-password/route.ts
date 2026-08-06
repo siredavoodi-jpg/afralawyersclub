@@ -4,8 +4,8 @@ import { generateOtpCode, sendOtpSms } from "@/lib/otp";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const RESET_SECRET = (process.env.JWT_SECRET as string) + "_RESET";
-const RESET_EXPIRY = 10 * 60; // 10 دقیقه بر حسب ثانیه
+const RESET_SECRET = process.env.JWT_RESET_SECRET || process.env.JWT_SECRET || "reset-secret-key";
+const RESET_EXPIRY = "15m";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,10 +14,11 @@ export async function POST(req: NextRequest) {
 
     // مرحله ۱: فقط موبایل ارسال شده → ارسال پیامک
     if (phone && !otp && !tempToken) {
-      const user = await prisma.user.findUnique({ where: { phone } });
-      
+      // جستجوی کاربر با موبایل
+      let user = await prisma.user.findUnique({ where: { phone } });
+
       if (!user) {
-        // برای امنیت، نشان نمی‌دهیم کاربر وجود ندارد یا نه
+        // برای امنیت، وانمود می‌کنیم ارسال شد
         return NextResponse.json({
           success: true,
           message: "اگر شماره موبایل شما ثبت شده باشد، کد تایید ارسال خواهد شد",
@@ -25,7 +26,10 @@ export async function POST(req: NextRequest) {
       }
 
       if (user.status !== "active") {
-        return NextResponse.json({ error: "حساب کاربری شما غیرفعال است" }, { status: 403 });
+        return NextResponse.json(
+          { error: "حساب کاربری شما غیرفعال است" },
+          { status: 403 }
+        );
       }
 
       // غیرفعال کردن کدهای قدیمی
@@ -36,9 +40,13 @@ export async function POST(req: NextRequest) {
 
       const code = generateOtpCode();
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-      await prisma.otpCode.create({ data: { userId: user.id, phone, code, expiresAt } });
+
+      await prisma.otpCode.create({
+        data: { userId: user.id, phone, code, expiresAt },
+      });
 
       const otpResult = await sendOtpSms(phone, code);
+
       if (!otpResult.ok) {
         return NextResponse.json({ error: "ارسال پیامک ناموفق بود" }, { status: 502 });
       }
@@ -57,7 +65,12 @@ export async function POST(req: NextRequest) {
       }
 
       const otpRecord = await prisma.otpCode.findFirst({
-        where: { phone, code: otp, consumed: false, expiresAt: { gt: new Date() } },
+        where: {
+          phone,
+          code: otp,
+          consumed: false,
+          expiresAt: { gt: new Date() },
+        },
         orderBy: { createdAt: "desc" },
       });
 
@@ -71,7 +84,7 @@ export async function POST(req: NextRequest) {
       });
 
       // صدور توکن موقت برای تنظیم رمز جدید
-      const tempToken = jwt.sign(
+      const token = jwt.sign(
         { userId: user.id, phone: user.phone, purpose: "password_reset" },
         RESET_SECRET,
         { expiresIn: RESET_EXPIRY }
@@ -79,7 +92,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        tempToken,
+        tempToken: token,
         message: "کد تایید شد. رمز عبور جدید را وارد کنید",
       });
     }
@@ -105,7 +118,10 @@ export async function POST(req: NextRequest) {
       try {
         payload = jwt.verify(tempToken, RESET_SECRET);
       } catch {
-        return NextResponse.json({ error: "لینک بازیابی منقضی شده است. لطفاً دوباره درخواست دهید" }, { status: 401 });
+        return NextResponse.json(
+          { error: "لینک بازیابی منقضی شده است. لطفاً دوباره درخواست دهید" },
+          { status: 401 }
+        );
       }
 
       if (payload.purpose !== "password_reset") {
@@ -113,7 +129,6 @@ export async function POST(req: NextRequest) {
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-
       await prisma.user.update({
         where: { id: payload.userId },
         data: { password: hashedPassword },

@@ -18,10 +18,13 @@ export async function POST(req: NextRequest) {
     } = await req.json();
 
     if (!phone || !name || !nationalId || !password) {
-      return NextResponse.json({ error: "نام، شماره موبایل، کد ملی و رمز عبور الزامی هستند" }, { status: 400 });
+      return NextResponse.json(
+        { error: "نام، شماره موبایل، کد ملی و رمز عبور الزامی هستند" },
+        { status: 400 }
+      );
     }
 
-    // اعتبارسنجی رمز عبور قوی (سمت سرور)
+    // اعتبارسنجی رمز عبور قوی
     if (password.length < 8) {
       return NextResponse.json({ error: "رمز عبور باید حداقل ۸ کاراکتر باشد" }, { status: 400 });
     }
@@ -55,38 +58,82 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const existingByNationalId = await prisma.user.findUnique({ where: { nationalId } });
-    if (existingByNationalId && existingByNationalId.phone !== phone) {
-      return NextResponse.json({ error: "این کد ملی قبلاً ثبت شده است" }, { status: 409 });
+    // بررسی تکراری بودن کد ملی
+    const existingByNationalId = await prisma.user.findUnique({
+      where: { nationalId },
+    });
+
+    if (existingByNationalId) {
+      // اگر کد ملی موجود است و موبایلش فرق دارد، خطا بده
+      if (existingByNationalId.phone !== phone) {
+        return NextResponse.json(
+          { error: "این کد ملی قبلاً با شماره موبایل دیگری ثبت شده است" },
+          { status: 409 }
+        );
+      }
+      // اگر کد ملی و موبایل هر دو یکسان هستند، اجازه ادامه بده (برای تکمیل ثبت‌نام ناقص)
+    }
+
+    // بررسی تکراری بودن موبایل
+    const existingByPhone = await prisma.user.findUnique({ where: { phone } });
+
+    if (existingByPhone) {
+      // اگر موبایل موجود است و کد ملی‌اش فرق دارد، خطا بده
+      if (existingByPhone.nationalId && existingByPhone.nationalId !== nationalId) {
+        return NextResponse.json(
+          { error: "این شماره موبایل قبلاً با کد ملی دیگری ثبت شده است" },
+          { status: 409 }
+        );
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // ایجاد یا به‌روزرسانی کاربر
     const user = await prisma.user.upsert({
       where: { phone },
-      update: { name, nationalId, password: hashedPassword },
-      create: { phone, name, nationalId, password: hashedPassword, role: "member" },
+      update: {
+        name,
+        nationalId,
+        password: hashedPassword,
+        role: existingByPhone?.role || "member",
+      },
+      create: {
+        phone,
+        name,
+        nationalId,
+        password: hashedPassword,
+        role: "member",
+      },
     });
 
+    // ایجاد رکورد وکیل اگر لازم باشد
     if (accountType === "lawyer") {
       await prisma.lawyer.upsert({
         where: { userId: user.id },
         update: {
           licenseNumber: license_number,
-          membershipType: membership_type,
+          membershipType: membership_type as any,
           licenseExpiry: new Date(license_expiry),
           verificationStatus: "pending",
         },
         create: {
           userId: user.id,
           licenseNumber: license_number,
-          membershipType: membership_type,
+          membershipType: membership_type as any,
           licenseExpiry: new Date(license_expiry),
           verificationStatus: "pending",
         },
       });
     }
 
+    // غیرفعال کردن کدهای OTP قدیمی
+    await prisma.otpCode.updateMany({
+      where: { phone, consumed: false },
+      data: { consumed: true },
+    });
+
+    // ایجاد و ارسال کد تایید
     const code = generateOtpCode();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -95,11 +142,18 @@ export async function POST(req: NextRequest) {
     });
 
     const otpResult = await sendOtpSms(phone, code);
+
     if (!otpResult.ok) {
-      return NextResponse.json({ error: "ارسال پیامک OTP ناموفق بود" }, { status: 502 });
+      return NextResponse.json(
+        { error: "ارسال پیامک OTP ناموفق بود. لطفاً دوباره تلاش کنید" },
+        { status: 502 }
+      );
     }
 
-    return NextResponse.json({ user: { id: user.id, phone: user.phone }, message: "کد تایید ارسال شد" });
+    return NextResponse.json({
+      user: { id: user.id, phone: user.phone },
+      message: "کد تایید ارسال شد",
+    });
   } catch (err) {
     console.error("Register error:", err);
     return NextResponse.json({ error: "خطای داخلی سرور" }, { status: 500 });
