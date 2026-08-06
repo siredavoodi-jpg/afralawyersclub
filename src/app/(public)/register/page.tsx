@@ -103,28 +103,42 @@ export default function RegisterPage() {
       setLoading(false);
     }
   }
+async function verifyOtp(e: React.FormEvent) {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-  async function verifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error();
+  try {
+    const res = await fetch("/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone,
+        otp,
+        accountType,
+        ...(accountType === "lawyer" && {
+          license_number: licenseNumber,
+          membership_type: membershipType,
+          license_expiry: licenseExpiry,
+        }),
+      }),
+    });
 
-      setAuthSession(data.token, data.user);
-      window.location.href = "/dashboard";
-    } catch {
-      setError("کد وارد شده صحیح نیست.");
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || "کد وارد شده صحیح نیست.");
+      return;
     }
+
+    setAuthSession(data.token, data.user);
+    window.location.href = "/dashboard";
+  } catch {
+    setError("ارتباط با سرور برقرار نشد.");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <section className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12 sm:px-6">

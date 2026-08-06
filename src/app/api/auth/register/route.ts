@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // اعتبارسنجی رمز عبور قوی
+    // اعتبارسنجی رمز عبور
     if (password.length < 8) {
       return NextResponse.json({ error: "رمز عبور باید حداقل ۸ کاراکتر باشد" }, { status: 400 });
     }
@@ -46,57 +46,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "کد ملی باید ۱۰ رقم باشد" }, { status: 400 });
     }
 
-    if (accountType === "lawyer") {
-      if (!license_number || !membership_type || !license_expiry) {
-        return NextResponse.json(
-          { error: "برای ثبت‌نام وکلا، شماره پروانه، نوع عضویت و تاریخ اعتبار الزامی است" },
-          { status: 400 }
-        );
-      }
-      if (membership_type !== "bar_association" && membership_type !== "judiciary_center") {
-        return NextResponse.json({ error: "نوع عضویت نامعتبر است" }, { status: 400 });
-      }
-    }
-
     // بررسی تکراری بودن کد ملی
     const existingByNationalId = await prisma.user.findUnique({
       where: { nationalId },
     });
 
-    if (existingByNationalId) {
-      // اگر کد ملی موجود است و موبایلش فرق دارد، خطا بده
-      if (existingByNationalId.phone !== phone) {
-        return NextResponse.json(
-          { error: "این کد ملی قبلاً با شماره موبایل دیگری ثبت شده است" },
-          { status: 409 }
-        );
-      }
-      // اگر کد ملی و موبایل هر دو یکسان هستند، اجازه ادامه بده (برای تکمیل ثبت‌نام ناقص)
+    if (existingByNationalId && existingByNationalId.phone !== phone) {
+      return NextResponse.json(
+        { error: "این کد ملی قبلاً با شماره موبایل دیگری ثبت شده است" },
+        { status: 409 }
+      );
     }
 
     // بررسی تکراری بودن موبایل
     const existingByPhone = await prisma.user.findUnique({ where: { phone } });
 
-    if (existingByPhone) {
-      // اگر موبایل موجود است و کد ملی‌اش فرق دارد، خطا بده
-      if (existingByPhone.nationalId && existingByPhone.nationalId !== nationalId) {
-        return NextResponse.json(
-          { error: "این شماره موبایل قبلاً با کد ملی دیگری ثبت شده است" },
-          { status: 409 }
-        );
-      }
+    if (existingByPhone && existingByPhone.nationalId && existingByPhone.nationalId !== nationalId) {
+      return NextResponse.json(
+        { error: "این شماره موبایل قبلاً با کد ملی دیگری ثبت شده است" },
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ایجاد یا به‌روزرسانی کاربر
+    // ایجاد کاربر با status = "inactive" (تا تایید OTP)
     const user = await prisma.user.upsert({
       where: { phone },
       update: {
         name,
         nationalId,
         password: hashedPassword,
-        role: existingByPhone?.role || "member",
+        status: "inactive", // ⚠️ غیرفعال تا تایید OTP
       },
       create: {
         phone,
@@ -104,28 +85,12 @@ export async function POST(req: NextRequest) {
         nationalId,
         password: hashedPassword,
         role: "member",
+        status: "inactive", // ⚠️ غیرفعال تا تایید OTP
       },
     });
 
-    // ایجاد رکورد وکیل اگر لازم باشد
-    if (accountType === "lawyer") {
-      await prisma.lawyer.upsert({
-        where: { userId: user.id },
-        update: {
-          licenseNumber: license_number,
-          membershipType: membership_type as any,
-          licenseExpiry: new Date(license_expiry),
-          verificationStatus: "pending",
-        },
-        create: {
-          userId: user.id,
-          licenseNumber: license_number,
-          membershipType: membership_type as any,
-          licenseExpiry: new Date(license_expiry),
-          verificationStatus: "pending",
-        },
-      });
-    }
+    // ❌ رکورد وکیل اینجا ایجاد نمی‌شود!
+    // فقط بعد از تایید OTP در verify-otp ایجاد می‌شود
 
     // غیرفعال کردن کدهای OTP قدیمی
     await prisma.otpCode.updateMany({
