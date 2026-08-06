@@ -24,7 +24,7 @@ export const sampleCourses: Course[] = [
     level: "intermediate",
     price: 0,
     isFree: true,
-    accessLevel: "users",
+    accessLevel: "trainees",
     rating: 4.9,
     studentsCount: 860,
   },

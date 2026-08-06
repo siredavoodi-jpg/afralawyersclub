@@ -1,4 +1,4 @@
-export type AccessLevel = "interested" | "users" | "lawyers";
+export type AccessLevel = "interested" | "users" | "trainees" | "lawyers";
 export type CourseLevel = "beginner" | "intermediate" | "advanced";
 
 export interface Course {
@@ -10,7 +10,7 @@ export interface Course {
   level: CourseLevel;
   price: number;
   isFree: boolean;
-  accessLevel: AccessLevel; // 🆕 سطح دسترسی
+  accessLevel: AccessLevel;
   image?: string;
   rating?: number;
   studentsCount?: number;

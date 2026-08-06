@@ -16,13 +16,13 @@ const accessLevelConfig: Record<
 > = {
   interested: { label: "برای علاقمندان", tone: "accent" },
   users: { label: "برای کاربران", tone: "secondary" },
+  trainees: { label: "برای کارآموزان", tone: "neutral" },
   lawyers: { label: "برای وکلای عضو باشگاه", tone: "neutral" },
 };
 
 export function CourseCard({ course }: { course: Course }) {
   const accessInfo = accessLevelConfig[course.accessLevel];
 
-  // لینک ویژه برای دوره AI
   const courseLink = course.id === "ai-for-lawyers" 
     ? "/courses/ai-for-lawyers" 
     : `/courses/${course.id}`;
