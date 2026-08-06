@@ -88,7 +88,7 @@ export default function HomePage() {
             {/* تصویر فعلی سایت - بدون تغییر */}
             <div className="flex justify-center">
               <Image
-                src="/images/avatar.png"
+                src="/images/hero.jpg"
                 alt="باشگاه وکلای افرا"
                 width={400}
                 height={267}

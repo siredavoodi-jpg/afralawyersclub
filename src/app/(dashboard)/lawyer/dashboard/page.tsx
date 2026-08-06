@@ -12,9 +12,10 @@ const quickStats = [
 ];
 
 export default function LawyerDashboardPage() {
-  // وکلا به همه دوره‌ها دسترسی دارند
-  const allCourses = sampleCourses;
-
+  // وکلا به همه دوره‌ها دسترسی دارند (بجز دوره‌های اختصاصی کارآموزی)
+  const lawyerCourses = sampleCourses.filter(
+    (c) => c.accessLevel !== "trainees"
+  );
   return (
     <div>
       <h1 className="text-2xl font-bold text-neutral-900">داشبورد وکیل</h1>
@@ -51,9 +52,9 @@ export default function LawyerDashboardPage() {
         به عنوان وکیل عضو باشگاه، به همه دوره‌های آموزشی دسترسی دارید
       </p>
       <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {allCourses.map((c) => (
-          <CourseCard key={c.id} course={c} />
-        ))}
+        {lawyerCourses.map((c) => (
+  <CourseCard key={c.id} course={c} />
+))}
       </div>
     </div>
   );

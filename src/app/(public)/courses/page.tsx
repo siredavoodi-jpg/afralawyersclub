@@ -25,13 +25,19 @@ export default function CoursesPage() {
             برای وکلای عضو باشگاه
           </Link>
         </div>
+{/* Grid دوره‌ها */}
+<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  {sampleCourses.map((course) => (
+    <CourseCard key={course.id} course={course} />
+  ))}
+</div>
 
-        {/* Grid دوره‌ها */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sampleCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+{/* اطلاع‌رسانی دوره‌های کارآموزی */}
+<div className="mt-8 rounded-lg bg-accent-50 p-4 text-center">
+  <p className="text-sm text-accent-700">
+    💡 دوره‌های اختصاصی کارآموزان فقط برای کارآموزان و وکلای عضو باشگاه قابل دسترسی است
+  </p>
+</div>
       </section>
     </>
   );
