@@ -6,21 +6,43 @@ import type {
   ReactNode,
 } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "white";
-type ButtonSize = "sm" | "md" | "lg";
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "white"
+  | "danger"
+  | "success"
+  | "warning"
+  | "outline"
+  | "dark";
+
+type ButtonSize = "xs" | "sm" | "md" | "lg";
 
 const baseStyles =
   "inline-flex items-center justify-center gap-2 rounded-btn font-bold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]",
+  primary:
+    "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]",
   secondary:
     "border-2 border-secondary bg-white/70 text-primary hover:bg-secondary-light",
   ghost: "text-primary hover:bg-primary-50",
-  white: "bg-white text-primary hover:scale-[1.02] hover:bg-primary-50",
+  white:
+    "bg-white text-primary hover:scale-[1.02] hover:bg-primary-50",
+  danger:
+    "bg-red-600 text-white hover:bg-red-700 hover:scale-[1.02]",
+  success:
+    "bg-accent text-white hover:bg-accent-hover hover:scale-[1.02]",
+  warning:
+    "bg-secondary text-white hover:bg-secondary-hover hover:scale-[1.02]",
+  outline:
+    "border border-line bg-white text-ink hover:border-primary hover:text-primary",
+  dark: "bg-ink text-white hover:bg-ink/90 hover:scale-[1.02]",
 };
 
 const sizes: Record<ButtonSize, string> = {
+  xs: "px-3 py-1.5 text-xs",
   sm: "px-4 py-2 text-xs",
   md: "px-6 py-2.5 text-sm",
   lg: "px-7 py-3 text-sm",
