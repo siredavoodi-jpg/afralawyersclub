@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UserRole, UserStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Award } from "lucide-react";
@@ -8,8 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminTraineesPage() {
   const pendingTrainees = await prisma.user.findMany({
     where: {
-      role: "trainee",
-      status: "inactive",
+      role: UserRole.trainee,
+      status: UserStatus.inactive,
     },
     select: {
       id: true,
