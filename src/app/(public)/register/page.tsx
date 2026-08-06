@@ -22,7 +22,7 @@ export default function RegisterPage() {
   const [accountType, setAccountType] = useState<AccountType>("member");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  // اطلاعات کارآموز 🆕
+  // اطلاعات کارآموز
   const [traineeLicenseNumber, setTraineeLicenseNumber] = useState("");
 
   // اطلاعات وکیل
@@ -86,7 +86,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    // اعتبارسنجی رمز عبور قوی
     if (password.length < 8) {
       setError("رمز عبور باید حداقل ۸ کاراکتر باشد.");
       return;
@@ -189,7 +188,6 @@ export default function RegisterPage() {
         </div>
       )}
 
-      {/* ═══════════ مرحله ۱: اطلاعات پایه ═══════════ */}
       {step === "info" && (
         <form onSubmit={submitInfo} className="mt-8 space-y-5">
           <div>
@@ -294,7 +292,6 @@ export default function RegisterPage() {
             dir="ltr"
           />
 
-          {/* فیلدهای کارآموز 🆕 */}
           {accountType === "trainee" && (
             <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-secondary-700">
@@ -314,7 +311,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* فیلدهای وکیل */}
           {accountType === "lawyer" && (
             <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 space-y-4">
               <p className="flex items-center gap-2 text-sm font-bold text-primary-700">
@@ -381,7 +377,6 @@ export default function RegisterPage() {
         </form>
       )}
 
-      {/* ═══════════ مرحله ۲: رمز عبور ═══════════ */}
       {step === "password" && (
         <form onSubmit={submitPassword} className="mt-8 space-y-5">
           <Input
@@ -413,7 +408,6 @@ export default function RegisterPage() {
         </form>
       )}
 
-      {/* ═══════════ مرحله ۳: کد تایید ═══════════ */}
       {step === "otp" && (
         <form onSubmit={verifyOtp} className="mt-8 space-y-5">
           <div className="rounded-lg bg-accent-50 p-4 text-center text-sm text-accent-700">
