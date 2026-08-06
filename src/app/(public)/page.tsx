@@ -16,7 +16,8 @@ import {
   Brain,
   FolderOpen,
   Headset,
-  Database,
+  Award,
+  Target,
 } from "lucide-react";
 import { CourseCard } from "@/components/course/CourseCard";
 import { AiToolCard } from "@/components/ai/AiToolCard";
@@ -32,7 +33,7 @@ export default function HomePage() {
   return (
     <>
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش Hero */}
+      {/* بخش Hero - با تصویر hero.jpg */}
       {/* ═══════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
@@ -51,7 +52,7 @@ export default function HomePage() {
                 کارآموزان و دانشجویان حقوق.
               </p>
 
-              {/* دکمه‌های جدید */}
+              {/* دکمه‌ها */}
               <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
                 <Link
                   href="/register"
@@ -85,14 +86,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* تصویر فعلی سایت - بدون تغییر */}
+            {/* تصویر hero.jpg */}
             <div className="flex justify-center">
               <Image
                 src="/images/hero.jpg"
                 alt="باشگاه وکلای افرا"
-                width={400}
-                height={267}
-                className="h-56 w-auto lg:h-72"
+                width={600}
+                height={400}
+                className="h-64 w-full max-w-lg rounded-2xl object-cover shadow-lg lg:h-80"
                 priority
               />
             </div>
@@ -101,41 +102,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش آمار */}
-      {/* ═══════════════════════════════════════════ */}
-      <section className="border-y border-neutral-100 bg-neutral-50">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-primary-600">
-                {siteStats.usersCount}
-              </p>
-              <p className="mt-1 text-sm text-neutral-500">کاربر فعال</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-primary-600">
-                {siteStats.casesAnalyzed}
-              </p>
-              <p className="mt-1 text-sm text-neutral-500">پرونده تحلیل‌شده</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-primary-600">
-                {siteStats.coursesCount}
-              </p>
-              <p className="mt-1 text-sm text-neutral-500">دوره آموزشی</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-extrabold text-primary-600">
-                {siteStats.satisfaction}
-              </p>
-              <p className="mt-1 text-sm text-neutral-500">رضایت کاربران</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════ */}
-      {/* بخش خدمات رایگان برای همه */}
+      {/* بخش ۱: خدمات رایگان برای همه */}
       {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
@@ -208,7 +175,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش خدمات ویژه داشبورد (فقط اعضا) */}
+      {/* بخش ۲: داشبورد هوشمند افرا (ویژه اعضا) */}
       {/* ═══════════════════════════════════════════ */}
       <section className="bg-gradient-to-b from-primary-50 to-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -317,11 +284,72 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+
+          {/* ═══════════════════════════════════════ */}
+          {/* بنر ویژه همکار کارآموز (وکلای پایه یک آینده) */}
+          {/* ═══════════════════════════════════════ */}
+          <div className="mt-10 overflow-hidden rounded-2xl bg-gradient-to-l from-secondary-500 to-secondary-600">
+            <div className="grid grid-cols-1 items-center gap-8 p-8 lg:grid-cols-2 lg:p-10">
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white">
+                  <Award size={16} aria-hidden />
+                  همکار کارآموز · وکلای پایه یک آینده
+                </span>
+                <h3 className="mt-4 text-2xl font-extrabold text-white sm:text-3xl">
+                  تا آزمون اختبار در کنار شما هستیم
+                </h3>
+                <p className="mt-3 leading-7 text-secondary-50">
+                  دوره‌های اختصاصی آمادگی برای اختبار، راهنمایی گام به گام و
+                  پشتیبانی تخصصی تا رسیدن به پروانه وکالت. مسیر موفقیت شما،
+                  ماموریت ماست.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-secondary-600 transition-fast hover:bg-secondary-50"
+                  >
+                    شروع مسیر موفقیت
+                    <ArrowLeft size={16} aria-hidden />
+                  </Link>
+                  <Link
+                    href="/courses"
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 px-6 py-3 text-sm font-bold text-white transition-fast hover:bg-white/10"
+                  >
+                    مشاهده دوره‌های اختبار
+                  </Link>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white">
+                    <Target size={24} aria-hidden />
+                  </span>
+                  <div>
+                    <p className="font-bold text-white">دوره‌های اختصاصی اختبار</p>
+                    <p className="mt-1 text-sm text-secondary-50">
+                      محتوای تخصصی برای آمادگی کامل آزمون
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 rounded-xl bg-white/10 p-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/20 text-white">
+                    <Users size={24} aria-hidden />
+                  </span>
+                  <div>
+                    <p className="font-bold text-white">مشاوره و همراهی مستمر</p>
+                    <p className="mt-1 text-sm text-secondary-50">
+                      از شروع کارآموزی تا دریافت پروانه وکالت
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش دوره‌ها - فقط ۳ دوره */}
+      {/* بخش ۳: دوره‌های آموزشی - فقط ۳ دوره */}
       {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
@@ -362,54 +390,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش نظرات کاربران */}
-      {/* ═══════════════════════════════════════════ */}
-      <section className="bg-neutral-50 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-neutral-900">
-              نظرات کاربران
-            </h2>
-            <p className="mt-2 text-neutral-600">
-              تجربه وکلا و دانشجویان حقوق از استفاده از افرا
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t) => (
-              <div
-                key={t.id}
-                className="rounded-2xl bg-white p-6 shadow-sm border border-neutral-100"
-              >
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className={
-                        i < t.rating
-                          ? "fill-secondary-500 text-secondary-500"
-                          : "text-neutral-200"
-                      }
-                      aria-hidden
-                    />
-                  ))}
-                </div>
-                <p className="mt-4 text-sm leading-6 text-neutral-700">
-                  «{t.quote}»
-                </p>
-                <div className="mt-4 border-t border-neutral-100 pt-4">
-                  <p className="text-sm font-bold text-neutral-900">{t.name}</p>
-                  <p className="text-xs text-neutral-500">{t.role}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════ */}
-      {/* بخش مقالات */}
+      {/* بخش ۴: آخرین مقالات */}
       {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
@@ -459,7 +440,88 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════ */}
-      {/* بخش CTA */}
+      {/* بخش ۵: آمار سایت */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="border-y border-neutral-100 bg-neutral-50">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.usersCount}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">کاربر فعال</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.casesAnalyzed}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">پرونده تحلیل‌شده</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.coursesCount}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">دوره آموزشی</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.satisfaction}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">رضایت کاربران</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش ۶: نظرات کاربران */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold text-neutral-900">
+              نظرات کاربران
+            </h2>
+            <p className="mt-2 text-neutral-600">
+              تجربه وکلا و دانشجویان حقوق از استفاده از افرا
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                className="rounded-2xl bg-white p-6 shadow-sm border border-neutral-100"
+              >
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      size={16}
+                      className={
+                        i < t.rating
+                          ? "fill-secondary-500 text-secondary-500"
+                          : "text-neutral-200"
+                      }
+                      aria-hidden
+                    />
+                  ))}
+                </div>
+                <p className="mt-4 text-sm leading-6 text-neutral-700">
+                  «{t.quote}»
+                </p>
+                <div className="mt-4 border-t border-neutral-100 pt-4">
+                  <p className="text-sm font-bold text-neutral-900">{t.name}</p>
+                  <p className="text-xs text-neutral-500">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش ۷: CTA */}
       {/* ═══════════════════════════════════════════ */}
       <section className="bg-gradient-to-l from-primary-600 to-primary-700 py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">

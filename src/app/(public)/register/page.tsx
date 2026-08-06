@@ -2,51 +2,87 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Input } from "@/components/ui/Input";
+import { Scale, Sparkles, ArrowLeft, Award } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { setAuthSession } from "@/lib/auth-client";
 
+type Step = "info" | "password" | "otp";
+type AccountType = "member" | "trainee" | "lawyer";
+
 export default function RegisterPage() {
-  const [step, setStep] = useState<"info" | "password" | "otp">("info");
-  const [accountType, setAccountType] = useState<"member" | "lawyer">("member");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [nationalId, setNationalId] = useState("");
-  const [licenseNumber, setLicenseNumber] = useState("");
-  const [membershipType, setMembershipType] = useState<"bar_association" | "judiciary_center">("bar_association");
-  const [licenseExpiry, setLicenseExpiry] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<Step>("info");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function validateInfoAndProceed(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
+  // اطلاعات پایه
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [nationalId, setNationalId] = useState("");
+  const [accountType, setAccountType] = useState<AccountType>("member");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-    if (!acceptedTerms) {
-      setError("برای ثبت‌نام باید قوانین و مقررات را بپذیرید.");
-      return;
+  // اطلاعات کارآموز 🆕
+  const [traineeLicenseNumber, setTraineeLicenseNumber] = useState("");
+
+  // اطلاعات وکیل
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [membershipType, setMembershipType] = useState("");
+  const [licenseExpiry, setLicenseExpiry] = useState("");
+
+  // رمز عبور
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // OTP
+  const [otp, setOtp] = useState("");
+
+  function validateInfo(): boolean {
+    if (!name.trim()) {
+      setError("نام و نام خانوادگی الزامی است.");
+      return false;
     }
-    
+    if (!/^09\d{9}$/.test(phone)) {
+      setError("شماره موبایل معتبر وارد کنید (مثال: 09123456789).");
+      return false;
+    }
     if (!/^\d{10}$/.test(nationalId)) {
       setError("کد ملی باید ۱۰ رقم باشد.");
-      return;
+      return false;
     }
-    
+    if (accountType === "trainee" && !traineeLicenseNumber.trim()) {
+      setError("شماره پروانه کارآموزی الزامی است.");
+      return false;
+    }
     if (accountType === "lawyer") {
-      if (!licenseNumber || !membershipType || !licenseExpiry) {
-        setError("لطفاً تمامی اطلاعات مربوط به پروانه وکالت را تکمیل کنید.");
-        return;
+      if (!licenseNumber.trim()) {
+        setError("شماره پروانه وکالت الزامی است.");
+        return false;
+      }
+      if (!membershipType) {
+        setError("نوع عضویت را انتخاب کنید.");
+        return false;
+      }
+      if (!licenseExpiry) {
+        setError("تاریخ انقضای پروانه الزامی است.");
+        return false;
       }
     }
+    if (!acceptedTerms) {
+      setError("پذیرش قوانین و مقررات الزامی است.");
+      return false;
+    }
+    return true;
+  }
 
+  function submitInfo(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    if (!validateInfo()) return;
     setStep("password");
   }
 
-  async function submitAllInfo(e: React.FormEvent) {
+  async function submitPassword(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -84,6 +120,9 @@ export default function RegisterPage() {
           password,
           acceptedTerms,
           accountType,
+          ...(accountType === "trainee" && {
+            trainee_license_number: traineeLicenseNumber,
+          }),
           ...(accountType === "lawyer" && {
             license_number: licenseNumber,
             membership_type: membershipType,
@@ -91,6 +130,7 @@ export default function RegisterPage() {
           }),
         }),
       });
+
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "ثبت‌نام با خطا مواجه شد.");
@@ -103,205 +143,301 @@ export default function RegisterPage() {
       setLoading(false);
     }
   }
-async function verifyOtp(e: React.FormEvent) {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
 
-  try {
-    const res = await fetch("/api/auth/verify-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        phone,
-        otp,
-        accountType,
-        ...(accountType === "lawyer" && {
-          license_number: licenseNumber,
-          membership_type: membershipType,
-          license_expiry: licenseExpiry,
-        }),
-      }),
-    });
+  async function verifyOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, otp }),
+      });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.error || "کد وارد شده صحیح نیست.");
-      return;
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "کد وارد شده صحیح نیست.");
+        return;
+      }
+      setAuthSession(data.token, data.user);
+      window.location.href = "/dashboard";
+    } catch {
+      setError("ارتباط با سرور برقرار نشد.");
+    } finally {
+      setLoading(false);
     }
-
-    setAuthSession(data.token, data.user);
-    window.location.href = "/dashboard";
-  } catch {
-    setError("ارتباط با سرور برقرار نشد.");
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
-    <section className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12 sm:px-6">
-      <h1 className="text-2xl font-bold text-neutral-900">ثبت‌نام رایگان</h1>
-      <p className="mt-2 text-sm text-neutral-600">
-        {step === "info" ? "اطلاعات خود را وارد کنید" : 
-         step === "password" ? "یک رمز عبور قوی انتخاب کنید" : 
-         "کد پیامک‌شده را وارد کنید"}
-      </p>
+    <div className="mx-auto max-w-lg px-4 py-16 sm:px-6">
+      <div className="text-center">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+          <Scale size={28} aria-hidden />
+        </span>
+        <h1 className="mt-4 text-2xl font-extrabold text-neutral-900">
+          عضویت در باشگاه وکلای افرا
+        </h1>
+        <p className="mt-2 text-sm text-neutral-600">
+          به جامعه هوشمند وکالت بپیوندید
+        </p>
+      </div>
 
-      {step === "info" ? (
-        <form onSubmit={validateInfoAndProceed} className="mt-8 flex flex-col gap-5">
-          <div className="flex rounded-lg border border-neutral-300 p-1">
-            <button
-              type="button"
-              onClick={() => setAccountType("member")}
-              className={`flex-1 rounded-md py-2 text-sm font-medium transition-fast ${
-                accountType === "member" ? "bg-primary-600 text-white" : "text-neutral-600"
-              }`}
-            >
-              کاربر عادی
-            </button>
-            <button
-              type="button"
-              onClick={() => setAccountType("lawyer")}
-              className={`flex-1 rounded-md py-2 text-sm font-medium transition-fast ${
-                accountType === "lawyer" ? "bg-primary-600 text-white" : "text-neutral-600"
-              }`}
-            >
-              وکیل
-            </button>
+      {error && (
+        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {/* ═══════════ مرحله ۱: اطلاعات پایه ═══════════ */}
+      {step === "info" && (
+        <form onSubmit={submitInfo} className="mt-8 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-neutral-700">
+              شما کیستید؟
+            </label>
+            <div className="mt-2 space-y-2">
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-fast ${
+                  accountType === "member"
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-neutral-200 bg-white hover:border-primary-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="accountType"
+                  value="member"
+                  checked={accountType === "member"}
+                  onChange={(e) => setAccountType(e.target.value as AccountType)}
+                  className="text-primary-600 focus:ring-primary-500"
+                />
+                <div>
+                  <p className="font-bold text-neutral-900">علاقمند / دانشجوی حقوق</p>
+                  <p className="text-xs text-neutral-500">
+                    دسترسی به دوره‌ها و خدمات عمومی
+                  </p>
+                </div>
+              </label>
+
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-fast ${
+                  accountType === "trainee"
+                    ? "border-secondary-500 bg-secondary-50"
+                    : "border-neutral-200 bg-white hover:border-secondary-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="accountType"
+                  value="trainee"
+                  checked={accountType === "trainee"}
+                  onChange={(e) => setAccountType(e.target.value as AccountType)}
+                  className="text-secondary-600 focus:ring-secondary-500"
+                />
+                <div className="flex-1">
+                  <p className="flex items-center gap-2 font-bold text-neutral-900">
+                    <Award size={16} className="text-secondary-600" aria-hidden />
+                    همکار کارآموز
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    وکلای پایه یک آینده · تا آزمون اختبار در کنار شما هستیم
+                  </p>
+                </div>
+              </label>
+
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition-fast ${
+                  accountType === "lawyer"
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-neutral-200 bg-white hover:border-primary-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="accountType"
+                  value="lawyer"
+                  checked={accountType === "lawyer"}
+                  onChange={(e) => setAccountType(e.target.value as AccountType)}
+                  className="text-primary-600 focus:ring-primary-500"
+                />
+                <div>
+                  <p className="font-bold text-neutral-900">وکیل دادگستری</p>
+                  <p className="text-xs text-neutral-500">
+                    دسترسی کامل به ابزارها و خدمات حرفه‌ای
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
 
-          <Input label="نام و نام خانوادگی" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
           <Input
-            label="کد ملی"
-            name="nationalId"
-            inputMode="numeric"
-            placeholder="۱۰ رقم"
-            value={nationalId}
-            onChange={(e) => setNationalId(e.target.value)}
-            required
-          />
-          <Input
-            label="شماره موبایل"
-            name="phone"
-            type="tel"
-            placeholder="09xxxxxxxxx"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
+            label="نام و نام خانوادگی"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="مثال: علی محمدی"
           />
 
-          {accountType === "lawyer" && (
-            <>
+          <Input
+            label="شماره موبایل"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="09123456789"
+            dir="ltr"
+          />
+
+          <Input
+            label="کد ملی"
+            value={nationalId}
+            onChange={(e) => setNationalId(e.target.value)}
+            placeholder="۱۰ رقم"
+            dir="ltr"
+          />
+
+          {/* فیلدهای کارآموز 🆕 */}
+          {accountType === "trainee" && (
+            <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4">
+              <p className="mb-3 flex items-center gap-2 text-sm font-bold text-secondary-700">
+                <Sparkles size={16} aria-hidden />
+                اطلاعات کارآموزی
+              </p>
               <Input
-                label="شماره پروانه"
-                name="license_number"
+                label="شماره پروانه کارآموزی"
+                value={traineeLicenseNumber}
+                onChange={(e) => setTraineeLicenseNumber(e.target.value)}
+                placeholder="مثال: 12345"
+                dir="ltr"
+              />
+              <p className="mt-2 text-xs text-neutral-500">
+                ⚠️ حساب شما پس از بررسی و تایید توسط ادمین فعال خواهد شد.
+              </p>
+            </div>
+          )}
+
+          {/* فیلدهای وکیل */}
+          {accountType === "lawyer" && (
+            <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 space-y-4">
+              <p className="flex items-center gap-2 text-sm font-bold text-primary-700">
+                <Scale size={16} aria-hidden />
+                اطلاعات وکالت
+              </p>
+              <Input
+                label="شماره پروانه وکالت"
                 value={licenseNumber}
                 onChange={(e) => setLicenseNumber(e.target.value)}
-                required
+                placeholder="مثال: 12345"
+                dir="ltr"
               />
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="membership_type" className="text-sm font-medium text-neutral-700">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700">
                   نوع عضویت
                 </label>
                 <select
-                  id="membership_type"
                   value={membershipType}
-                  onChange={(e) => setMembershipType(e.target.value as "bar_association" | "judiciary_center")}
-                  className="rounded-lg border border-neutral-300 px-4 py-2.5 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                  onChange={(e) => setMembershipType(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
                 >
+                  <option value="">انتخاب کنید...</option>
                   <option value="bar_association">کانون وکلای دادگستری</option>
                   <option value="judiciary_center">مرکز وکلای قوه قضاییه</option>
                 </select>
               </div>
-              <Input
-                label="تاریخ اعتبار پروانه"
-                name="license_expiry"
-                type="date"
-                value={licenseExpiry}
-                onChange={(e) => setLicenseExpiry(e.target.value)}
-                required
-              />
-            </>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700">
+                  تاریخ انقضای پروانه
+                </label>
+                <input
+                  type="date"
+                  value={licenseExpiry}
+                  onChange={(e) => setLicenseExpiry(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+                />
+              </div>
+              <p className="text-xs text-neutral-500">
+                ⚠️ حساب شما پس از بررسی و تایید توسط ادمین فعال خواهد شد.
+              </p>
+            </div>
           )}
 
-          <label className="flex items-start gap-2.5 text-sm text-neutral-700">
+          <label className="flex items-start gap-2 text-sm text-neutral-600">
             <input
               type="checkbox"
               checked={acceptedTerms}
               onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+              className="mt-1 text-primary-600 focus:ring-primary-500"
             />
             <span>
-              با وارد کردن دکمه ثبت‌نام، تمامی{" "}
-              <Link href="/terms" className="text-primary-600 underline">
+              <Link href="/terms" className="text-primary-600 hover:underline">
                 قوانین و مقررات
               </Link>{" "}
-              را می‌پذیرم.
+              باشگاه وکلای افرا را می‌پذیرم.
             </span>
           </label>
 
-          {error && <p className="text-sm text-error">{error}</p>}
-          <Button type="submit" size="lg" disabled={loading}>
-            {loading ? "در حال بررسی..." : "مرحله بعد (تعیین رمز عبور)"}
-          </Button>
-        </form>
-      ) : step === "password" ? (
-        <form onSubmit={submitAllInfo} className="mt-8 flex flex-col gap-5">
-          <Input
-            label="رمز عبور"
-            name="password"
-            type="password"
-            placeholder="حداقل ۸ کاراکتر شامل عدد و حروف کوچک و بزرگ"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Input
-            label="تکرار رمز عبور"
-            name="confirmPassword"
-            type="password"
-            placeholder="تکرار رمز عبور"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          
-          {error && <p className="text-sm text-error">{error}</p>}
-          <div className="flex gap-3">
-            <Button type="button" variant="ghost" size="lg" onClick={() => setStep("info")}>
-              بازگشت
-            </Button>
-            <Button type="submit" size="lg" disabled={loading} className="flex-1">
-              {loading ? "در حال ثبت..." : "ثبت‌نام و دریافت کد تایید"}
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <form onSubmit={verifyOtp} className="mt-8 flex flex-col gap-5">
-          <Input
-            label="کد تایید"
-            name="otp"
-            inputMode="numeric"
-            placeholder="۶ رقم"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            error={error}
-            required
-          />
-          <Button type="submit" size="lg" disabled={loading}>
-            {loading ? "در حال بررسی..." : "تایید و ورود"}
+          <Button type="submit" variant="primary" className="w-full">
+            ادامه
+            <ArrowLeft size={16} aria-hidden />
           </Button>
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-neutral-600">
+      {/* ═══════════ مرحله ۲: رمز عبور ═══════════ */}
+      {step === "password" && (
+        <form onSubmit={submitPassword} className="mt-8 space-y-5">
+          <Input
+            label="رمز عبور"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="حداقل ۸ کاراکتر شامل حرف بزرگ، کوچک و عدد"
+            dir="ltr"
+          />
+          <Input
+            label="تکرار رمز عبور"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="رمز عبور را دوباره وارد کنید"
+            dir="ltr"
+          />
+          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+            {loading ? "در حال ارسال..." : "ثبت‌نام و دریافت کد تایید"}
+          </Button>
+          <button
+            type="button"
+            onClick={() => setStep("info")}
+            className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700"
+          >
+            بازگشت به مرحله قبل
+          </button>
+        </form>
+      )}
+
+      {/* ═══════════ مرحله ۳: کد تایید ═══════════ */}
+      {step === "otp" && (
+        <form onSubmit={verifyOtp} className="mt-8 space-y-5">
+          <div className="rounded-lg bg-accent-50 p-4 text-center text-sm text-accent-700">
+            کد تایید به شماره <strong dir="ltr">{phone}</strong> ارسال شد.
+          </div>
+          <Input
+            label="کد تایید"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="کد ۵ رقمی"
+            dir="ltr"
+          />
+          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+            {loading ? "در حال تایید..." : "تایید کد و ورود"}
+          </Button>
+        </form>
+      )}
+
+      <p className="mt-8 text-center text-sm text-neutral-600">
         قبلاً ثبت‌نام کرده‌اید؟{" "}
-        <Link href="/login" className="font-medium text-primary-600">
-          ورود
+        <Link href="/login" className="font-medium text-primary-600 hover:text-primary-700">
+          وارد شوید
         </Link>
       </p>
-    </section>
+    </div>
   );
 }
