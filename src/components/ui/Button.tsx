@@ -58,7 +58,7 @@ interface CommonProps {
 /* ─── ButtonLink: برای سازگاری با کد موجود (Navbar) ─── */
 interface ButtonLinkProps
   extends CommonProps,
-    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className"> {
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "children"> {
   href: string;
 }
 
@@ -82,11 +82,15 @@ export function ButtonLink({
 }
 
 /* ─── Button: نسخه انعطاف‌پذیر (button یا link) ─── */
-type ButtonProps = CommonProps &
-  (
-    | (ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined })
-    | (AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
-  );
+type ButtonAsButton = CommonProps &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children">;
+
+type ButtonAsLink = CommonProps &
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "children"> & {
+    href: string;
+  };
+
+type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 export function Button({
   variant = "primary",
@@ -98,9 +102,7 @@ export function Button({
   const classes = cn(baseStyles, variants[variant], sizes[size], className);
 
   if ("href" in props && props.href !== undefined) {
-    const { href, ...rest } = props as AnchorHTMLAttributes<HTMLAnchorElement> & {
-      href: string;
-    };
+    const { href, ...rest } = props as ButtonAsLink;
     return (
       <Link href={href} className={classes} {...rest}>
         {children}
@@ -111,7 +113,7 @@ export function Button({
   return (
     <button
       className={classes}
-      {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
+      {...(props as Omit<ButtonAsButton, "children">)}
     >
       {children}
     </button>
