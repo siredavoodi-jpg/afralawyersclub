@@ -55,10 +55,7 @@ export function CourseCard({ course }: { course: Course }) {
           )}
         </div>
 
-        <div className="mt-auto flex items-center justify-between pt-2 border-t border-neutral-100">
-          <span className="font-bold text-secondary-600">
-            {course.isFree ? "رایگان" : `${course.price.toLocaleString("fa-IR")} تومان`}
-          </span>
+        <div className="mt-auto flex items-center justify-end pt-2 border-t border-neutral-100">
           <Link
             href={`/courses/${course.id}`}
             className="text-sm font-medium text-primary-600 hover:text-primary-700"

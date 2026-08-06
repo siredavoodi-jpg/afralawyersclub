@@ -1,8 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
-import { GraduationCap, Sparkles, Users, Star } from "lucide-react";
-import { ButtonLink } from "@/components/ui/Button";
-import { Card, CardBody } from "@/components/ui/Card";
+import {
+  ArrowLeft,
+  BookOpen,
+  FileSearch,
+  FileText,
+  ShieldCheck,
+  MessageCircle,
+  Users,
+  Star,
+  Sparkles,
+  GraduationCap,
+  Scale,
+} from "lucide-react";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { CourseCard } from "@/components/course/CourseCard";
 import { AiToolCard } from "@/components/ai/AiToolCard";
 import {
@@ -13,84 +24,150 @@ import {
   siteStats,
 } from "@/lib/sample-data";
 
-const whyAfra = [
-  {
-    icon: GraduationCap,
-    title: "آموزش تخصصی AI برای وکلا",
-    desc: "دوره‌های کاربردی برای یادگیری هوش مصنوعی، مخصوص جامعه حقوقی.",
-  },
-  {
-    icon: Sparkles,
-    title: "ابزارهای حقوقی مبتنی بر AI",
-    desc: "تحلیل پرونده، تولید دادخواست و تحلیل قرارداد در چند دقیقه.",
-  },
-  {
-    icon: Users,
-    title: "جامعه تخصصی وکلا",
-    desc: "انجمنی برای تبادل تجربه و یادگیری از هم‌کاران حرفه‌ای.",
-  },
-];
-
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="bg-gradient-to-b from-primary-50 to-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-24">
-          <div className="animate-fade-up">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent-50 px-4 py-1.5 text-sm font-medium text-accent-700">
-              <Sparkles size={16} aria-hidden /> نسل جدید خدمات حقوقی
-            </span>
-            <h1 className="text-4xl font-extrabold leading-tight text-neutral-900 sm:text-5xl lg:text-6xl">
-              آینده وکالت با <span className="text-primary-600">هوش مصنوعی</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neutral-600">
-              آموزش AI، تحلیل پرونده، تولید دادخواست — همه در یک پلتفرم.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <ButtonLink href="/register" variant="secondary" size="lg">
-                پیوستن به افرا
-              </ButtonLink>
-              <ButtonLink href="/courses" variant="primary" size="lg">
-                مشاهده دوره‌ها
-              </ButtonLink>
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش Hero */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary-50 via-white to-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+            <div className="text-center lg:text-right">
+              <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent-50 px-4 py-1.5 text-sm font-medium text-accent-700">
+                <Sparkles size={16} aria-hidden />
+                باشگاه وکلای افرا
+              </span>
+              <h1 className="text-3xl font-extrabold leading-tight text-neutral-900 sm:text-4xl lg:text-5xl">
+                هوش مصنوعی در خدمت
+                <span className="text-primary-600"> جامعه وکالت</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-neutral-600 mx-auto lg:mx-0">
+                آموزش، ابزارهای هوشمند و منابع تخصصی برای وکلا، کارآموزان و
+                دانشجویان حقوق. با افرا، آینده وکالت را بسازید.
+              </p>
+              <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
+                <Link
+                  href="/courses"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 text-sm font-bold text-white transition-fast hover:bg-primary-700"
+                >
+                  مشاهده دوره‌ها
+                  <ArrowLeft size={16} aria-hidden />
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-primary-200 bg-white px-6 py-3 text-sm font-bold text-primary-700 transition-fast hover:border-primary-400"
+                >
+                  عضویت رایگان
+                </Link>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src="/images/avatar.png"
+                alt="باشگاه وکلای افرا"
+                width={400}
+                height={267}
+                className="h-56 w-auto lg:h-72"
+                priority
+              />
             </div>
           </div>
-          <div className="relative aspect-square overflow-hidden rounded-3xl shadow-xl lg:aspect-auto lg:h-96">
-            <Image
-              src="/images/hero.jpg"
-              alt="وکلای باشگاه افرا در حال کار با دستیار هوش مصنوعی"
-              fill
-              priority
-              className="object-cover"
-            />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش آمار */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="border-y border-neutral-100 bg-neutral-50">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.usersCount}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">کاربر فعال</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.casesAnalyzed}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">پرونده تحلیل‌شده</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.coursesCount}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">دوره آموزشی</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-extrabold text-primary-600">
+                {siteStats.satisfaction}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">رضایت کاربران</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* چرا افرا */}
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش دوره‌ها - فقط ۳ دوره */}
+      {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl font-bold text-neutral-900">چرا افرا؟</h2>
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {whyAfra.map((item) => (
-            <Card key={item.title}>
-              <CardBody className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-600">
-                  <item.icon size={24} aria-hidden />
-                </span>
-                <h3 className="font-bold text-neutral-900">{item.title}</h3>
-                <p className="text-sm text-neutral-600">{item.desc}</p>
-              </CardBody>
-            </Card>
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="text-center sm:text-right">
+            <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-neutral-900 sm:justify-start">
+              <GraduationCap size={28} className="text-primary-600" aria-hidden />
+              دوره‌های آموزشی
+            </h2>
+            <p className="mt-1 text-neutral-600">
+              آموزش‌های تخصصی برای وکلا و علاقمندان
+            </p>
+          </div>
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-fast hover:bg-primary-700"
+          >
+            مشاهده همه دوره‌ها
+            <ArrowLeft size={16} aria-hidden />
+          </Link>
+        </div>
+
+        {/* فقط ۳ دوره اول نمایش داده شود */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {sampleCourses.slice(0, 3).map((course) => (
+            <CourseCard key={course.id} course={course} />
           ))}
+        </div>
+
+        {/* لینک مشاهده همه */}
+        <div className="mt-8 text-center">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
+          >
+            مشاهده همه {sampleCourses.length} دوره
+            <ArrowLeft size={14} aria-hidden />
+          </Link>
         </div>
       </section>
 
-      {/* خدمات AI */}
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش ابزارهای AI */}
+      {/* ═══════════════════════════════════════════ */}
       <section className="bg-neutral-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-neutral-900">خدمات AI</h2>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-8 text-center">
+            <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-neutral-900">
+              <Sparkles size={28} className="text-primary-600" aria-hidden />
+              ابزارهای هوش مصنوعی
+            </h2>
+            <p className="mt-1 text-neutral-600">
+              ابزارهای حقوقی مبتنی بر AI برای وکلای احراز شده
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {aiToolCards.map((tool) => (
               <AiToolCard key={tool.id} tool={tool} />
             ))}
@@ -98,95 +175,185 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* دوره‌ها */}
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش چرا افرا؟ */}
+      {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-neutral-900">دوره‌ها</h2>
-          <Link href="/courses" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-            مشاهده همه ←
-          </Link>
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-bold text-neutral-900">
+            چرا باشگاه وکلای افرا؟
+          </h2>
+          <p className="mt-2 text-neutral-600">
+            مزایای عضویت در بزرگ‌ترین جامعه وکلای مبتنی بر هوش مصنوعی
+          </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sampleCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
-      </section>
 
-      {/* آمار */}
-      <section className="bg-primary-700 py-16">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 text-center sm:px-6 lg:grid-cols-4 lg:px-8">
-          {[
-            { label: "کاربران", value: siteStats.usersCount },
-            { label: "پرونده‌های تحلیل شده", value: siteStats.casesAnalyzed },
-            { label: "دوره‌ها", value: siteStats.coursesCount },
-            { label: "رضایت کاربران", value: siteStats.satisfaction },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <p className="text-3xl font-extrabold text-white sm:text-4xl">{stat.value}</p>
-              <p className="mt-2 text-sm text-primary-100">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col items-center text-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+              <Scale size={32} aria-hidden />
+            </span>
+            <h3 className="mt-4 text-lg font-bold text-neutral-900">
+              تخصص حقوقی
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">
+              تمام ابزارها و دوره‌ها با همکاری وکلای باتجربه و متخصصان حقوقی
+              طراحی شده‌اند.
+            </p>
+          </div>
 
-      {/* نظرات کاربران */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl font-bold text-neutral-900">نظرات وکلا</h2>
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {testimonials.map((t) => (
-            <Card key={t.id}>
-              <CardBody className="flex flex-col gap-3">
-                <div className="flex gap-0.5 text-secondary-500">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} size={16} className="fill-secondary-500" aria-hidden />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed text-neutral-700">«{t.quote}</p>
-                <div>
-                  <p className="text-sm font-bold text-neutral-900">{t.name}</p>
-                  <p className="text-xs text-neutral-500">{t.role}</p>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </section>
+          <div className="flex flex-col items-center text-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-50 text-accent-600">
+              <Sparkles size={32} aria-hidden />
+            </span>
+            <h3 className="mt-4 text-lg font-bold text-neutral-900">
+              هوش مصنوعی پیشرفته
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">
+              از جدیدترین فناوری‌های AI برای تحلیل پرونده، تولید دادخواست و
+              بررسی قرارداد استفاده می‌کنیم.
+            </p>
+          </div>
 
-      {/* دعوت به عضویت */}
-      <section className="bg-primary-600">
-        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white">همین حالا به جمع وکلای هوشمند بپیوندید</h2>
-          <div className="mt-8">
-            <ButtonLink href="/register" variant="secondary" size="lg">
-              پیوستن به افرا
-            </ButtonLink>
+          <div className="flex flex-col items-center text-center">
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary-50 text-secondary-600">
+              <Users size={32} aria-hidden />
+            </span>
+            <h3 className="mt-4 text-lg font-bold text-neutral-900">
+              جامعه پویا
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">
+              به شبکه‌ای از وکلا، کارآموزان و دانشجویان حقوق بپیوندید و تجربه‌های
+              خود را به اشتراک بگذارید.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* آخرین مقالات */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl font-bold text-neutral-900">آخرین مقالات</h2>
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {latestArticles.map((a) => (
-            <Card key={a.id}>
-              <div className="flex aspect-video items-center justify-center bg-neutral-100 text-neutral-400">
-                تصویر مقاله
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش نظرات کاربران */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="bg-primary-50 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold text-neutral-900">
+              نظرات کاربران
+            </h2>
+            <p className="mt-2 text-neutral-600">
+              تجربه وکلا و دانشجویان حقوق از استفاده از افرا
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                className="rounded-2xl bg-white p-6 shadow-sm border border-neutral-100"
+              >
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      size={16}
+                      className={
+                        i < t.rating
+                          ? "fill-secondary-500 text-secondary-500"
+                          : "text-neutral-200"
+                      }
+                      aria-hidden
+                    />
+                  ))}
+                </div>
+                <p className="mt-4 text-sm leading-6 text-neutral-700">
+                  «{t.quote}»
+                </p>
+                <div className="mt-4 border-t border-neutral-100 pt-4">
+                  <p className="text-sm font-bold text-neutral-900">{t.name}</p>
+                  <p className="text-xs text-neutral-500">{t.role}</p>
+                </div>
               </div>
-              <CardBody className="flex flex-col gap-2">
-                <p className="text-xs text-neutral-500">{a.publishedAt}</p>
-                <h3 className="font-bold text-neutral-900">{a.title}</h3>
-                <p className="line-clamp-2 text-sm text-neutral-600">{a.summary}</p>
-                <Link
-                  href={`/library/articles/${a.slug}`}
-                  className="mt-2 text-sm font-medium text-primary-600 hover:text-primary-700"
-                >
-                  ادامه مطلب ←
-                </Link>
-              </CardBody>
-            </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش مقالات */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="text-center sm:text-right">
+            <h2 className="flex items-center justify-center gap-2 text-2xl font-bold text-neutral-900 sm:justify-start">
+              <BookOpen size={28} className="text-primary-600" aria-hidden />
+              آخرین مقالات
+            </h2>
+            <p className="mt-1 text-neutral-600">
+              جدیدترین مطالب آموزشی و تحلیلی
+            </p>
+          </div>
+          <Link
+            href="/library/articles"
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-primary-200 px-5 py-2.5 text-sm font-medium text-primary-700 transition-fast hover:border-primary-400"
+          >
+            مشاهده همه مقالات
+            <ArrowLeft size={16} aria-hidden />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {latestArticles.map((article) => (
+            <Link
+              key={article.id}
+              href={`/library/articles/${article.slug}`}
+              className="group rounded-2xl border border-neutral-100 bg-white p-6 transition-fast hover:border-primary-200 hover:shadow-md"
+            >
+              <h3 className="text-lg font-bold text-neutral-900 group-hover:text-primary-600">
+                {article.title}
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-neutral-600 line-clamp-3">
+                {article.summary}
+              </p>
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-xs text-neutral-400">
+                  {new Date(article.publishedAt).toLocaleDateString("fa-IR")}
+                </span>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-primary-600">
+                  ادامه مطلب
+                  <ArrowLeft size={14} aria-hidden />
+                </span>
+              </div>
+            </Link>
           ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش CTA */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="bg-gradient-to-l from-primary-600 to-primary-700 py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
+            همین حالا به باشگاه وکلای افرا بپیوندید
+          </h2>
+          <p className="mt-4 text-lg text-primary-100">
+            عضویت رایگان است. به دوره‌ها، ابزارها و جامعه وکلا دسترسی پیدا
+            کنید.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3.5 text-sm font-bold text-primary-700 transition-fast hover:bg-primary-50"
+            >
+              عضویت رایگان
+              <ArrowLeft size={16} aria-hidden />
+            </Link>
+            <Link
+              href="/courses"
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 px-8 py-3.5 text-sm font-bold text-white transition-fast hover:bg-white/10"
+            >
+              مشاهده دوره‌ها
+            </Link>
+          </div>
         </div>
       </section>
     </>
