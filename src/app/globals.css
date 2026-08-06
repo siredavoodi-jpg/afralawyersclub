@@ -24,3 +24,8 @@ body {
     scroll-behavior: auto !important;
   }
 }
+@layer utilities {
+  .transition-fast {
+    transition: all 150ms ease-out;
+  }
+}
