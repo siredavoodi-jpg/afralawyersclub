@@ -15,6 +15,7 @@ datasource db {
 enum UserRole {
   guest
   member
+  trainee // 🆕 کارآموز وکالت (وکلای پایه یک آینده)
   lawyer
   admin
 }
@@ -80,57 +81,58 @@ enum Gender {
 }
 
 model User {
-  id                    String     @id @default(uuid())
-  phone                 String     @unique
-  email                 String?
-  name                  String
-  nationalId            String?    @unique @map("national_id")
-  password   String?
- passwordHash          String?    @map("password_hash")
-  gender                Gender?
-  legalInterests        String[]   @default([]) @map("legal_interests")
-  legalInterestOther     String?    @map("legal_interest_other")
-  afraCollaboration     String[]   @default([]) @map("afra_collaboration")
-  afraCollaborationOther String?   @map("afra_collaboration_other")
-  role                  UserRole   @default(guest)
-  status                UserStatus @default(active)
-  createdAt             DateTime   @default(now()) @map("created_at")
-  updatedAt             DateTime   @updatedAt @map("updated_at")
-
-  lawyer        Lawyer?
-  subscriptions Subscription[]
-  aiRequests    AiRequest[]
-  enrollments   Enrollment[]
-  otpCodes      OtpCode[]
+  id                   String           @id @default(uuid())
+  phone                String           @unique
+  email                String?
+  name                 String
+  nationalId           String?          @unique @map("national_id")
+  password             String?
+  passwordHash         String?          @map("password_hash")
+  gender               Gender?
+  legalInterests       String[]         @default([]) @map("legal_interests")
+  legalInterestOther   String?          @map("legal_interest_other")
+  afraCollaboration    String[]         @default([]) @map("afra_collaboration")
+  afraCollaborationOther String?        @map("afra_collaboration_other")
+  role                 UserRole         @default(guest)
+  status               UserStatus       @default(active)
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+  // 🆕 فیلدهای کارآموزی
+  traineeLicenseNumber String?          @unique @map("trainee_license_number")
+  traineeVerifiedAt    DateTime?        @map("trainee_verified_at")
+  lawyer               Lawyer?
+  subscriptions        Subscription[]
+  aiRequests           AiRequest[]
+  enrollments          Enrollment[]
+  otpCodes             OtpCode[]
 
   @@map("users")
 }
-model Lawyer {
-  id                 String               @id @default(uuid())
-  userId             String               @unique @map("user_id")
-  licenseNumber      String               @unique @map("license_number")
-  membershipType     LawyerMembershipType @map("membership_type")
-  licenseExpiry      DateTime             @map("license_expiry")
-  verificationStatus VerificationStatus   @default(pending) @map("verification_status")
-  verifiedAt         DateTime?            @map("verified_at")
-  createdAt          DateTime             @default(now()) @map("created_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Lawyer {
+  id                 String                @id @default(uuid())
+  userId             String                @unique @map("user_id")
+  licenseNumber      String                @unique @map("license_number")
+  membershipType     LawyerMembershipType  @map("membership_type")
+  licenseExpiry      DateTime              @map("license_expiry")
+  verificationStatus VerificationStatus    @default(pending) @map("verification_status")
+  verifiedAt         DateTime?             @map("verified_at")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("lawyers")
 }
 
 model Subscription {
-  id        String              @id @default(uuid())
-  userId    String              @map("user_id")
-  plan      SubscriptionPlan    @default(free)
-  status    SubscriptionStatus  @default(active)
-  startDate DateTime            @map("start_date")
-  endDate   DateTime            @map("end_date")
-  autoRenew Boolean             @default(false) @map("auto_renew")
-  createdAt DateTime            @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String               @id @default(uuid())
+  userId     String               @map("user_id")
+  plan       SubscriptionPlan     @default(free)
+  status     SubscriptionStatus   @default(active)
+  startDate  DateTime             @map("start_date")
+  endDate    DateTime             @map("end_date")
+  autoRenew  Boolean              @default(false) @map("auto_renew")
+  createdAt  DateTime             @default(now()) @map("created_at")
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
 }
@@ -147,7 +149,6 @@ model Course {
   image       String?
   status      CourseStatus @default(draft)
   createdAt   DateTime     @default(now()) @map("created_at")
-
   lessons     Lesson[]
   enrollments Enrollment[]
 
@@ -162,8 +163,7 @@ model Lesson {
   duration  Int // minutes
   videoUrl  String?  @map("video_url")
   createdAt DateTime @default(now()) @map("created_at")
-
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@map("lessons")
 }
@@ -174,26 +174,24 @@ model Enrollment {
   courseId  String   @map("course_id")
   progress  Int      @default(0) // percent
   createdAt DateTime @default(now()) @map("created_at")
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@map("enrollments")
 }
 
 model AiRequest {
-  id          String          @id @default(uuid())
-  userId      String          @map("user_id")
-  serviceType AiServiceType   @map("service_type")
-  inputData   Json            @map("input_data")
-  outputData  Json?           @map("output_data")
-  tokensUsed  Int             @default(0) @map("tokens_used")
-  cost        Decimal         @default(0)
-  status      AiRequestStatus @default(pending)
-  createdAt   DateTime        @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String          @id @default(uuid())
+  userId     String          @map("user_id")
+  serviceType AiServiceType  @map("service_type")
+  inputData  Json            @map("input_data")
+  outputData Json?           @map("output_data")
+  tokensUsed Int             @default(0) @map("tokens_used")
+  cost       Decimal         @default(0)
+  status     AiRequestStatus @default(pending)
+  createdAt  DateTime        @default(now()) @map("created_at")
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_requests")
 }
@@ -207,19 +205,18 @@ model OtpCode {
   consumed  Boolean  @default(false)
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("otp_codes")
 }
 
 model Article {
-  id        String   @id @default(uuid())
-  title     String
-  slug      String   @unique
-  summary   String
-  content   String
-  image     String?
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  content     String
+  image       String?
   publishedAt DateTime @default(now()) @map("published_at")
 
   @@map("articles")
@@ -230,15 +227,15 @@ model Article {
 // ─────────────────────────────────────────────
 
 model MarketCategory {
-  id        String           @id @default(cuid())
-  name      String           @unique
-  slug      String           @unique
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
   icon      String?
   parentId  String?
-  parent    MarketCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children  MarketCategory[] @relation("CategoryTree")
+  parent    MarketCategory?    @relation("CategoryTree", fields: [parentId], references: [id])
+  children  MarketCategory[]   @relation("CategoryTree")
   listings  MarketListing[]
-  createdAt DateTime         @default(now())
+  createdAt DateTime           @default(now())
 }
 
 model MarketListing {
