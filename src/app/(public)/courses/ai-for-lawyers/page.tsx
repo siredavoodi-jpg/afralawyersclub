@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, Sparkles, BookOpen, Users } from "lucide-react";
+import { Lock, Sparkles, BookOpen } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/Button";
 import { course } from "@/lib/course";
@@ -29,12 +29,11 @@ export default function CourseLandingPage() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>
             <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent-50 px-4 py-1.5 text-sm font-medium text-accent-700">
-              <Users size={16} aria-hidden />
-              برای علاقمندان · فصل اول منتشر شد
+              <Sparkles size={16} aria-hidden />
+              فصل اول رایگان + فصل دوم ویژه اعضا منتشر شد
             </span>
-            
             <h1 className="text-3xl font-extrabold leading-tight text-neutral-900 sm:text-4xl">
-              آموزش مقدمات <span className="text-primary-600">هوش مصنوعی</span>
+              هوش مصنوعی برای <span className="text-primary-600">وکلا</span>
             </h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-neutral-600">
               {course.description}. بدون هیچ پیش‌زمینه فنی، فهم درستی از هوش مصنوعی و کاربرد آن در کار حقوقی پیدا کنید.
@@ -64,7 +63,7 @@ export default function CourseLandingPage() {
                       <div className="flex items-start justify-between">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 font-bold text-white">{toFa(i + 1)}</span>
                         <span className={"rounded-full px-3 py-1 text-xs font-medium " + (ch.isFree ? "bg-accent-50 text-accent-700" : "bg-secondary-50 text-secondary-700")}>
-                          {ch.isFree ? "برای علاقمندان" : "ویژه اعضا"}
+                          {ch.isFree ? "رایگان" : "ویژه اعضا"}
                         </span>
                       </div>
                       <h3 className="font-bold text-neutral-900">{ch.title}</h3>
