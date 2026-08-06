@@ -11,7 +11,6 @@ import {
   Star,
   Sparkles,
   GraduationCap,
-  Scale,
   Lock,
   Brain,
   FolderOpen,
@@ -19,12 +18,8 @@ import {
   Award,
   Target,
   Bot,
-  Wand2,
-  FileCheck,
-  ScaleIcon,
 } from "lucide-react";
 import { CourseCard } from "@/components/course/CourseCard";
-import { AiToolCard } from "@/components/ai/AiToolCard";
 import {
   sampleCourses,
   testimonials,
@@ -394,63 +389,65 @@ export default function HomePage() {
         </div>
       </section>
 
-    {/* ═══════════════════════════════════════════ */}
-{/* بخش ۴: خدمات هوش مصنوعی - بخش جدید (بنفش) */}
-{/* ═══════════════════════════════════════════ */}
-<section className="bg-gradient-to-b from-purple-50 to-white py-12">
-  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div className="mb-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
-      <div className="text-center sm:text-right">
-        <h2 className="flex items-center justify-center gap-2 text-xl font-bold text-neutral-900 sm:justify-start">
-          <Bot size={24} className="text-purple-600" aria-hidden />
-          خدمات هوش مصنوعی
-        </h2>
-        <p className="mt-1 text-sm text-neutral-600">
-          ابزارهای حقوقی مبتنی بر AI برای وکلای احراز شده
-        </p>
-      </div>
-      <Link
-        href="/services"
-        className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-xs font-medium text-white transition-fast hover:bg-purple-700"
-      >
-        مشاهده همه خدمات
-        <ArrowLeft size={14} aria-hidden />
-      </Link>
-    </div>
-
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {/* فقط ۴ خدمت اول */}
-      {aiToolCards.slice(0, 4).map((tool) => (
-        <Link key={tool.id} href={tool.href} className="group">
-          <div className="flex flex-col items-center rounded-2xl border border-purple-100 bg-white p-5 text-center transition-fast hover:border-purple-300 hover:shadow-md">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
-              {tool.id === 'case-analysis' && <FileSearch size={20} aria-hidden />}
-              {tool.id === 'petition' && <FileText size={20} aria-hidden />}
-              {tool.id === 'contract' && <ShieldCheck size={20} aria-hidden />}
-              {tool.id === 'chat' && <MessageCircle size={20} aria-hidden />}
-            </span>
-            <h3 className="mt-2 text-sm font-bold text-neutral-900 group-hover:text-purple-600">
-              {tool.title}
-            </h3>
-            <p className="mt-1 text-xs text-neutral-600 line-clamp-2">
-              {tool.description}
-            </p>
+      {/* ═══════════════════════════════════════════ */}
+      {/* بخش ۴: خدمات هوش مصنوعی - بخش جدید (بنفش) */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="bg-gradient-to-b from-purple-50 to-white py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <div className="text-center sm:text-right">
+              <h2 className="flex items-center justify-center gap-2 text-xl font-bold text-neutral-900 sm:justify-start">
+                <Bot size={24} className="text-purple-600" aria-hidden />
+                خدمات هوش مصنوعی
+              </h2>
+              <p className="mt-1 text-sm text-neutral-600">
+                ابزارهای حقوقی مبتنی بر AI برای وکلای احراز شده
+              </p>
+            </div>
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-xs font-medium text-white transition-fast hover:bg-purple-700"
+            >
+              مشاهده همه خدمات
+              <ArrowLeft size={14} aria-hidden />
+            </Link>
           </div>
-        </Link>
-      ))}
-    </div>
 
-    <div className="mt-6 text-center">
-      <Link
-        href="/services"
-        className="inline-flex items-center gap-2 text-xs font-medium text-purple-600 hover:text-purple-700"
-      >
-        مشاهده همه {aiToolCards.length} خدمت هوش مصنوعی
-        <ArrowLeft size={12} aria-hidden />
-      </Link>
-    </div>
-  </div>
-</section>      {/* ═══════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* فقط ۴ خدمت اول - استفاده از tool.href و tool.id */}
+            {aiToolCards.slice(0, 4).map((tool) => (
+              <Link key={tool.id} href={tool.href} className="group">
+                <div className="flex flex-col items-center rounded-2xl border border-purple-100 bg-white p-5 text-center transition-fast hover:border-purple-300 hover:shadow-md">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
+                    {tool.id === "case-analysis" && <FileSearch size={20} aria-hidden />}
+                    {tool.id === "petition" && <FileText size={20} aria-hidden />}
+                    {tool.id === "contract" && <ShieldCheck size={20} aria-hidden />}
+                    {tool.id === "chat" && <MessageCircle size={20} aria-hidden />}
+                  </span>
+                  <h3 className="mt-2 text-sm font-bold text-neutral-900 group-hover:text-purple-600">
+                    {tool.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-neutral-600 line-clamp-2">
+                    {tool.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 text-xs font-medium text-purple-600 hover:text-purple-700"
+            >
+              مشاهده همه {aiToolCards.length} خدمت هوش مصنوعی
+              <ArrowLeft size={12} aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
       {/* بخش ۵: آخرین مقالات (زرد طلایی) */}
       {/* ═══════════════════════════════════════════ */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
