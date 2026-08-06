@@ -34,6 +34,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-vazirmatn)", "Vazirmatn", "Tahoma", "sans-serif"],
+        fa: ["var(--font-vazirmatn)", "Vazirmatn", "Tahoma", "sans-serif"], // ✅ اضافه شد برای سازگاری با globals.css
         en: ["var(--font-inter)", "Inter", "sans-serif"],
       },
       borderRadius: {
