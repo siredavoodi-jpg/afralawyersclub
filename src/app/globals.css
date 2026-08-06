@@ -2,30 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
-  @apply bg-white text-neutral-900 font-fa;
-}
+  body {
+    @apply bg-white text-neutral-900 antialiased;
+    font-family: var(--font-vazirmatn), "Vazirmatn", Tahoma, Arial, sans-serif;
+    line-height: 1.75;
+  }
 
-/* فوکوس قابل مشاهده برای کیبورد - بخش ۱۲ Accessibility */
-:focus-visible {
-  outline: 2px solid theme("colors.primary.500");
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  /* فشرده‌سازی فاصله حروف در عناوین طبق دستور طراحی */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.01em;
   }
 }
+
 @layer utilities {
+  /* تعریف کلاس font-fa برای سازگاری با کدهای موجود */
+  .font-fa {
+    font-family: var(--font-vazirmatn), "Vazirmatn", Tahoma, Arial, sans-serif;
+  }
+
+  /* کلاس transition-fast برای سازگاری با کدهای موجود */
   .transition-fast {
     transition: all 150ms ease-out;
+  }
+
+  /* فونت انگلیسی برای اعداد و متون لاتین */
+  .font-en {
+    font-family: var(--font-inter), "Inter", Arial, sans-serif;
   }
 }
