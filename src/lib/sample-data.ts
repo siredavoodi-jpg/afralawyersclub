@@ -3,7 +3,7 @@ import type { AiToolCard, ArticleSummary, Course, Testimonial } from "@/types";
 // دوره‌های فعلی سایت (۴ دوره)
 export const sampleCourses: Course[] = [
   {
-    id: "c1",
+    id: "ai-for-lawyers",
     title: "آموزش مقدمات هوش مصنوعی",
     description: "دوره جامع مقدماتی هوش مصنوعی ویژه جامعه وکالت؛ بدون نیاز به پیش‌زمینه فنی",
     instructor: "تیم آموزشی افرا",

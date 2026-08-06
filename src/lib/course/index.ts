@@ -4,8 +4,8 @@ import chapter02 from "./chapter-02";
 
 export const course: Course = {
   id: "ai-for-lawyers",
-  title: "هوش مصنوعی برای وکلا",
-  description: "دوره جامع مقدماتی هوش مصنوعی، ویژه جامعه وکالت",
+  title: "آموزش مقدمات هوش مصنوعی",
+  description: "دوره جامع مقدماتی هوش مصنوعی ویژه جامعه وکالت؛ بدون نیاز به پیش‌زمینه فنی",
   chapters: [chapter01, chapter02],
 };
 

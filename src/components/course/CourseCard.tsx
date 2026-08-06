@@ -22,6 +22,11 @@ const accessLevelConfig: Record<
 export function CourseCard({ course }: { course: Course }) {
   const accessInfo = accessLevelConfig[course.accessLevel];
 
+  // لینک ویژه برای دوره AI
+  const courseLink = course.id === "ai-for-lawyers" 
+    ? "/courses/ai-for-lawyers" 
+    : `/courses/${course.id}`;
+
   return (
     <Card className="flex h-full flex-col overflow-hidden">
       <CardBody className="flex flex-1 flex-col gap-3">
@@ -57,7 +62,7 @@ export function CourseCard({ course }: { course: Course }) {
 
         <div className="mt-auto flex items-center justify-end pt-2 border-t border-neutral-100">
           <Link
-            href={`/courses/${course.id}`}
+            href={courseLink}
             className="text-sm font-medium text-primary-600 hover:text-primary-700"
           >
             مشاهده دوره ←
