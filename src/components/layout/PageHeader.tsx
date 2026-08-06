@@ -1,10 +1,30 @@
-export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+import { cn } from "@/lib/utils";
+
+interface PageHeaderProps {
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  className?: string;
+}
+
+export function PageHeader({ title, subtitle, badge, className }: PageHeaderProps) {
   return (
-    <div className="border-b border-neutral-100 bg-neutral-50">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-neutral-900 sm:text-4xl">{title}</h1>
-        {subtitle && <p className="mt-3 max-w-2xl text-neutral-600">{subtitle}</p>}
+    <section className={cn("bg-hero-gradient py-12 sm:py-16", className)}>
+      <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        {badge && (
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 px-4 py-1.5 text-xs font-bold text-primary">
+            {badge}
+          </span>
+        )}
+        <h1 className="text-2xl font-extrabold leading-tight text-ink sm:text-3xl lg:text-4xl">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-ink-soft">
+            {subtitle}
+          </p>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
