@@ -1,17 +1,30 @@
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
 
 type BadgeTone = "primary" | "secondary" | "accent" | "neutral";
 
 const tones: Record<BadgeTone, string> = {
-  primary: "bg-primary-50 text-primary-700",
-  secondary: "bg-secondary-50 text-secondary-700",
-  accent: "bg-accent-50 text-accent-700",
-  neutral: "bg-neutral-100 text-neutral-700",
+  primary: "bg-primary/10 text-primary",
+  secondary: "bg-secondary/10 text-secondary-hover",
+  accent: "bg-accent/10 text-accent-hover",
+  neutral: "bg-base text-ink-soft",
 };
 
-export function Badge({ tone = "neutral", children }: { tone?: BadgeTone; children: React.ReactNode }) {
+interface BadgeProps {
+  children: ReactNode;
+  tone?: BadgeTone;
+  className?: string;
+}
+
+export function Badge({ children, tone = "primary", className }: BadgeProps) {
   return (
-    <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-medium", tones[tone])}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium",
+        tones[tone],
+        className
+      )}
+    >
       {children}
     </span>
   );
