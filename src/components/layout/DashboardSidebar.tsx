@@ -11,24 +11,26 @@ import {
   UserCircle,
   CreditCard,
   MessageSquare,
+  Star,
   LogOut,
   FileSearch,
   FileText,
   ShieldCheck,
-  FileStack,
   Briefcase,
   Scale,
   Sparkles,
   Users,
   UserCheck,
-  Settings,
   Menu,
   X,
-  Award,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { getAuthUser, clearAuthSession, type AuthUser } from "@/lib/auth-client";
+import {
+  getAuthUser,
+  clearAuthSession,
+  type AuthUser,
+} from "@/lib/auth-client";
 
 type SidebarVariant = "member" | "lawyer" | "admin";
 
@@ -45,62 +47,32 @@ const memberLinks: NavItem[] = [
   { href: "/dashboard/downloads", label: "دانلودها", icon: Download },
   { href: "/dashboard/notifications", label: "اعلان‌ها", icon: Bell, badge: "۲" },
   { href: "/dashboard/subscription", label: "اشتراک", icon: CreditCard },
-{ href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: MessageSquare },
+  { href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: Star },
   { href: "/dashboard/profile", label: "پروفایل", icon: UserCircle },
 ];
 
 const lawyerLinks: NavItem[] = [
   { href: "/lawyer/dashboard", label: "داشبورد وکیل", icon: LayoutDashboard },
-  {
-    href: "/lawyer/cases",
-    label: "پرونده‌ها و موکلین",
-    icon: Briefcase,
-{ href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: MessageSquare },
-  },
-  {
-    href: "/lawyer/ai/tools",
-    label: "ابزارهای AI",
-    icon: Sparkles,
-  },
-  {
-    href: "/lawyer/ai/case-analysis",
-    label: "تحلیل پرونده",
-    icon: FileSearch,
-  },
-  {
-    href: "/lawyer/ai/contract",
-    label: "تحلیل قرارداد",
-    icon: ShieldCheck,
-  },
-  {
-    href: "/lawyer/ai/documents",
-    label: "تولید اسناد",
-    icon: FileText,
-  },
-  {
-    href: "/lawyer/billing",
-    label: "صورت‌حساب",
-    icon: CreditCard,
-  },
-  {
-    href: "/lawyer/license",
-    label: "پروانه وکالت",
-    icon: Scale,
-  },
-  {
-    href: "/lawyer/subscription",
-    label: "اشتراک",
-    icon: CreditCard,
-  },
+  { href: "/lawyer/cases", label: "پرونده‌ها و موکلین", icon: Briefcase },
+  { href: "/lawyer/ai/tools", label: "ابزارهای AI", icon: Sparkles },
+  { href: "/lawyer/ai/case-analysis", label: "تحلیل پرونده", icon: FileSearch },
+  { href: "/lawyer/ai/contract", label: "تحلیل قرارداد", icon: ShieldCheck },
+  { href: "/lawyer/ai/documents", label: "تولید اسناد", icon: FileText },
+  { href: "/lawyer/billing", label: "صورت‌حساب", icon: CreditCard },
+  { href: "/lawyer/license", label: "پروانه وکالت", icon: Scale },
+  { href: "/lawyer/subscription", label: "اشتراک", icon: CreditCard },
+  { href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: Star },
 ];
 
 const adminLinks: NavItem[] = [
   { href: "/admin/lawyers", label: "مدیریت وکلا", icon: Users },
   { href: "/admin/trainees", label: "مدیریت کارآموزان", icon: UserCheck },
-  { href: "/admin/reviews", label: "مدیریت نظرات", icon: MessageSquare }, // 🆕 این خط را اضافه کنید
+  { href: "/admin/reviews", label: "مدیریت نظرات", icon: MessageSquare },
+  { href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: Star },
   { href: "/lawyer/dashboard", label: "نمای وکیل", icon: LayoutDashboard },
   { href: "/dashboard", label: "نمای کاربر", icon: UserCircle },
 ];
+
 const linkMap: Record<SidebarVariant, NavItem[]> = {
   member: memberLinks,
   lawyer: lawyerLinks,
@@ -122,7 +94,6 @@ export function DashboardSidebar({ variant }: { variant: SidebarVariant }) {
     setUser(getAuthUser());
   }, []);
 
-  // بستن drawer با تغییر مسیر
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
@@ -238,7 +209,7 @@ export function DashboardSidebar({ variant }: { variant: SidebarVariant }) {
 
   return (
     <>
-      {/* دکمه همبرگر برای موبایل */}
+      {/* دکمه همبرگر موبایل */}
       <button
         onClick={() => setMobileOpen(true)}
         className="fixed top-4 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-btn bg-primary text-white shadow-card-hover lg:hidden"
