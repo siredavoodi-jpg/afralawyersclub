@@ -2,32 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuthUser, type AuthUser } from "@/lib/auth-client";
+import { getAuthUser } from "@/lib/auth-client";
+
+// ✅ نقش trainee اضافه شد
+type Role = "guest" | "member" | "trainee" | "lawyer" | "admin";
 
 interface RequireRoleProps {
-  allowedRoles: AuthUser["role"][];
-  redirectTo?: string;
   children: React.ReactNode;
+  allowedRoles: Role[];
+  redirectTo?: string;
 }
 
-export function RequireRole({ allowedRoles, redirectTo = "/login", children }: RequireRoleProps) {
+export function RequireRole({
+  children,
+  allowedRoles,
+  redirectTo = "/login",
+}: RequireRoleProps) {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
     const user = getAuthUser();
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-    if (!allowedRoles.includes(user.role)) {
+    if (!user || !allowedRoles.includes(user.role as Role)) {
       router.replace(redirectTo);
       return;
     }
     setAllowed(true);
+    setReady(true);
   }, [allowedRoles, redirectTo, router]);
 
-  if (!allowed) return null;
-
+  if (!ready || !allowed) return null;
   return <>{children}</>;
 }
