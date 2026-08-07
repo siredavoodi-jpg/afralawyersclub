@@ -2,15 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, requireAdminRole } from "@/lib/api-guard";
 
-// GET: دریافت همه نظرات برای ادمین (شامل pending)
 export async function GET(req: NextRequest) {
   const auth = requireAuth(req);
   if ("error" in auth) return auth.error;
   const roleError = requireAdminRole(auth.payload);
   if (roleError) return roleError;
 
-  const statusFilter = req.nextUrl.searchParams.get("status"); // pending | approved | rejected | all
-  const typeFilter = req.nextUrl.searchParams.get("type"); // site | course | all
+  const statusFilter = req.nextUrl.searchParams.get("status");
+  const typeFilter = req.nextUrl.searchParams.get("type");
 
   const where: any = {};
 
@@ -30,7 +29,6 @@ export async function GET(req: NextRequest) {
         orderBy: [{ status: "asc" }, { createdAt: "desc" }],
         include: {
           user: { select: { id: true, name: true, phone: true, role: true } },
-          course: { select: { id: true, title: true } },
           reviewer: { select: { name: true } },
         },
         take: 100,
