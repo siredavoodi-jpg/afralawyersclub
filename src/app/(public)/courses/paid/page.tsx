@@ -4,11 +4,16 @@ import { sampleCourses } from "@/lib/sample-data";
 
 export default function PaidCoursesPage() {
   const courses = sampleCourses.filter((c) => !c.isFree);
+
   return (
     <>
-      <PageHeader title="دوره‌های پولی" subtitle="دوره‌های تخصصی برای وکلای حرفه‌ای" />
+      <PageHeader
+        badge="ویژه"
+        title="دوره‌های پولی"
+        subtitle="دوره‌های premium و تخصصی باشگاه وکلای افرا"
+      />
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}

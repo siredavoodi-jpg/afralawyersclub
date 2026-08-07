@@ -1,340 +1,247 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowRight, ArrowLeft, CheckCircle2, Lock, Search, StickyNote } from "lucide-react";
-import { Card, CardBody } from "@/components/ui/Card";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { getChapter, getLesson } from "@/lib/course";
-import { isLessonDone, markLessonDone, getNote, saveNote } from "@/lib/course/storage";
-import { getAuthUser, type AuthUser } from "@/lib/auth-client";
+import { notFound } from "next/navigation";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Clock,
+  PlayCircle,
+  CheckCircle2,
+  BookOpen,
+  ChevronLeft,
+} from "lucide-react";
+import { course } from "@/lib/course";
 
-const toFa = (n: number | string) => String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
+const toFa = (n: number | string) =>
+  String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
 
-const ICONS: Record<string, string> = {
-  brain: "🧠", layers: "🗂", sparkles: "✦", "book-text":  "📖",
-  "graduation-cap": "🎓", cpu: "⚙", search: "🔎", scale: "⚖",
-  list: "📋", flag: "🏁",
-};
-
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function Highlight({ text, term }: { text: string; term: string }) {
-  const t = term.trim();
-  if (!t) return <>{text}</>;
-  const parts = text.split(new RegExp(`(${escapeRegExp(t)})`, "g"));
-  return (
-    <>
-      {parts.map((p, i) =>
-        p === t ? (
-          <mark key={i} className="rounded bg-secondary-200 px-0.5 text-neutral-900">{p}</mark>
-        ) : (
-          <span key={i}>{p}</span>
-        )
-      )}
-    </>
+export default function LessonPage({
+  params,
+}: {
+  params: { chapterId: string; lessonId: string };
+}) {
+  // پیدا کردن فصل و درس (با مقایسه امن برای id عددی یا رشته‌ای)
+  const chapter = course.chapters.find(
+    (c) => String(c.id) === String(params.chapterId)
   );
-}
+  if (!chapter || !chapter.isActive) return notFound();
 
-export default function LessonPage() {
-  const params = useParams();
-  const chapterId = Number(params.chapterId);
-  const lessonId = Number(params.lessonId);
-  const chapter = getChapter(chapterId);
-  const lesson = getLesson(chapterId, lessonId);
+  const lessonIndex = chapter.lessons.findIndex(
+    (l) => String(l.id) === String(params.lessonId)
+  );
+  if (lessonIndex === -1) return notFound();
 
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [done, setDone] = useState(false);
-  const [term, setTerm] = useState("");
-  const [note, setNote] = useState("");
-  const [saved, setSaved] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const lesson = chapter.lessons[lessonIndex] as {
+    id: number | string;
+    title: string;
+    description?: string;
+    content?: string;
+    videoUrl?: string;
+    duration?: number;
+  };
 
-  useEffect(() => {
-    setUser(getAuthUser());
-    if (lesson) {
-      setDone(isLessonDone(lesson.id));
-      setNote(getNote(lesson.id));
-    }
-  }, [lesson]);
+  const prevLesson = lessonIndex > 0 ? chapter.lessons[lessonIndex - 1] : null;
+  const nextLesson =
+    lessonIndex < chapter.lessons.length - 1
+      ? chapter.lessons[lessonIndex + 1]
+      : null;
 
-  if (!chapter || !lesson) {
-    return (
-      <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-        <h1 className="text-2xl font-bold text-neutral-900">درس یافت نشد</h1>
-        <div className="mt-6">
-          <ButtonLink href="/courses/ai-for-lawyers" variant="secondary">بازگشت به دوره</ButtonLink>
-        </div>
-      </section>
-    );
-  }
-
-  const needsAuth = !chapter.isFree && !user;
-  const idx = chapter.lessons.findIndex((l) => l.id === lesson.id);
-  const prev = idx > 0 ? chapter.lessons[idx - 1] : null;
-  const next = idx < chapter.lessons.length - 1 ? chapter.lessons[idx + 1] : null;
-
-  function handleDone() {
-    if (!lesson) return;
-    markLessonDone(lesson.id);
-    setDone(true);
-  }
-
-  function handleSaveNote() {
-    if (!lesson) return;
-    saveNote(lesson.id, note);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
-  }
-
-  if (needsAuth) {
-    return (
-      <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-        <Lock size={40} className="mx-auto text-primary-600" aria-hidden />
-        <h1 className="mt-4 text-2xl font-bold text-neutral-900">این درس مخصوص اعضای باشگاه است</h1>
-        <p className="mt-3 text-neutral-600">برای دسترسی به این درس و سایر خدمات، عضو شوید یا وارد شوید.</p>
-        <div className="mt-6 flex justify-center gap-3">
-          <ButtonLink href="/register" variant="secondary">ثبت‌نام رایگان</ButtonLink>
-          <ButtonLink href="/login" variant="ghost">ورود</ButtonLink>
-        </div>
-      </section>
-    );
-  }
+  const chapterHref = `/courses/ai-for-lawyers/chapter/${chapter.id}`;
+  const makeLessonHref = (lessonId: number | string) =>
+    `/courses/ai-for-lawyers/chapter/${chapter.id}/lesson/${lessonId}`;
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <Link href={`/courses/ai-for-lawyers/chapter/${chapter.id}`} className="mb-6 inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700">
-        <ArrowRight size={16} aria-hidden />
-        فصل {toFa(chapter.id)} — {chapter.title}
-      </Link>
+    <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+      {/* ═══════════════════════════════════════════ */}
+      {/* مسیر بازگشت (Breadcrumb)                    */}
+      {/* ═══════════════════════════════════════════ */}
+      <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
+        <Link
+          href="/courses/ai-for-lawyers"
+          className="transition-colors hover:text-primary"
+        >
+          دوره هوش مصنوعی
+        </Link>
+        <ChevronLeft size={14} aria-hidden />
+        <Link
+          href={chapterHref}
+          className="transition-colors hover:text-primary"
+        >
+          فصل {toFa(chapter.id)}: {chapter.title}
+        </Link>
+        <ChevronLeft size={14} aria-hidden />
+        <span className="font-medium text-ink">درس {toFa(lessonIndex + 1)}</span>
+      </nav>
 
-      {/* جستجو در درس */}
-      <div className="relative mb-6">
-        <input
-          type="text"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-          placeholder="جستجو در این درس…"
-          className="w-full rounded-full border border-neutral-300 bg-white py-2.5 pl-4 pr-11 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
-        />
-        <Search size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400" aria-hidden />
-      </div>
-
-      <p className="text-sm text-primary-600">درس {toFa(idx + 1)} از {toFa(chapter.lessons.length)}</p>
-      <h1 className="mt-1 text-2xl font-bold text-neutral-900">
-        <span className="ml-2">{ICONS[lesson.icon] || "📄"}</span>
-        {lesson.title}
-      </h1>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">⏱ {lesson.readingTime}</span>
-        <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">سطح: {lesson.difficulty}</span>
-      </div>
-      {lesson.informationCurrencyNote && (
-        <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-xs leading-6 text-neutral-600">
-          🔄 {lesson.informationCurrencyNote}
-        </div>
-      )}
-      {lesson.objectives && lesson.objectives.length > 0 && (
-        <div className="mt-6 rounded-lg border-r-4 border-primary-500 bg-primary-50 p-5">
-          <h3 className="font-bold text-neutral-900">در پایان این درس می‌توانید:</h3>
-          <ul className="mt-3 flex flex-col gap-2">
-            {lesson.objectives.map((o, i) => (
-              <li key={i} className="text-sm leading-7 text-neutral-700">◆ <Highlight text={o} term={term} /></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.sections && lesson.sections.map((s, i) => (
-        <div key={i} className="mt-8">
-          <h2 className="border-b border-neutral-200 pb-2 text-lg font-bold text-neutral-900">
-            <Highlight text={s.heading} term={term} />
-          </h2>
-          {s.paragraphs.map((p, j) => (
-            <p key={j} className="mt-3 leading-8 text-neutral-700">
-              <Highlight text={p} term={term} />
-            </p>
-          ))}
-        </div>
-      ))}
-
-      {lesson.examples && lesson.examples.length > 0 && (
-        <div className="mt-8 rounded-lg border-r-4 border-secondary-500 bg-secondary-50 p-5">
-          <h3 className="font-bold text-neutral-900">✦ مثال‌ها</h3>
-          <ul className="mt-3 flex flex-col gap-2">
-            {lesson.examples.map((e, i) => (
-              <li key={i} className="text-sm leading-7 text-neutral-700">— <Highlight text={e} term={term} /></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.tips && lesson.tips.length > 0 && (
-        <div className="mt-4 rounded-lg border-r-4 border-accent-500 bg-accent-50 p-5">
-          <h3 className="font-bold text-neutral-900">✓ نکات کاربردی</h3>
-          <ul className="mt-3 flex flex-col gap-2">
-            {lesson.tips.map((t, i) => (
-              <li key={i} className="text-sm leading-7 text-neutral-700">— <Highlight text={t} term={term} /></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.commonMistakes && lesson.commonMistakes.length > 0 && (
-        <div className="mt-4 rounded-lg border-r-4 border-error bg-red-50 p-5">
-          <h3 className="font-bold text-neutral-900">⚠ اشتباهات رایج</h3>
-          <ul className="mt-3 flex flex-col gap-2">
-            {lesson.commonMistakes.map((m, i) => (
-              <li key={i} className="text-sm leading-7 text-neutral-700">— <Highlight text={m} term={term} /></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.prosCons && (
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border-r-4 border-accent-500 bg-accent-50 p-5">
-            <h3 className="font-bold text-neutral-900">مزایا</h3>
-            <ul className="mt-3 flex flex-col gap-2">
-              {lesson.prosCons.pros.map((p, i) => (
-                <li key={i} className="text-sm leading-7 text-neutral-700">{p}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-lg border-r-4 border-error bg-red-50 p-5">
-            <h3 className="font-bold text-neutral-900">معایب</h3>
-            <ul className="mt-3 flex flex-col gap-2">
-              {lesson.prosCons.cons.map((c, i) => (
-                <li key={i} className="text-sm leading-7 text-neutral-700">{c}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {lesson.comparisonTable && (
-        <div className="mt-8 overflow-hidden rounded-lg border border-neutral-200">
-          <h3 className="border-b border-neutral-200 bg-primary-50 p-4 font-bold text-primary-800">{lesson.comparisonTable.title}</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-xs">
-              <thead>
-                <tr>
-                  {lesson.comparisonTable.headers.map((h, i) => (
-                    <th key={i} className="border border-neutral-200 bg-neutral-50 px-3 py-2 text-right font-bold text-neutral-800">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {lesson.comparisonTable.rows.map((r, ri) => (
-                  <tr key={ri}>
-                    {r.map((c, ci) => (
-                      <td key={ci} className="border border-neutral-200 px-3 py-2 text-neutral-700">{c}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {lesson.exercise && lesson.exercise.length > 0 && (
-        <div className="mt-8 rounded-lg bg-neutral-900 p-6 text-white">
-          <h3 className="font-bold text-secondary-300">✎ تمرین این درس</h3>
-          {lesson.exercise.map((e, i) => (
-            <p key={i} className="mt-3 text-sm leading-7 text-neutral-200"><Highlight text={e} term={term} /></p>
-          ))}
-          <Button onClick={() => setShowAnswer((v) => !v)} variant="secondary" size="sm">
-            {showAnswer ? "پنهان کردن پاسخ" : "نمایش پاسخ پیشنهادی"}
-          </Button>
-          {showAnswer && lesson.answer && (
-            <div className="mt-4 border-t border-dashed border-neutral-600 pt-4">
-              {lesson.answer.map((a, i) => (
-                <p key={i} className="text-sm leading-7 text-neutral-300"><Highlight text={a} term={term} /></p>
-              ))}
-            </div>
+      {/* ═══════════════════════════════════════════ */}
+      {/* هدر درس                                     */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="mb-8">
+        <span className="text-xs font-bold text-secondary">
+          درس {toFa(lessonIndex + 1)} از {toFa(chapter.lessons.length)} · فصل{" "}
+          {toFa(chapter.id)}
+        </span>
+        <h1 className="mt-1 text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
+          {lesson.title}
+        </h1>
+        <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-ink-soft">
+          {typeof lesson.duration === "number" && (
+            <span className="flex items-center gap-1.5">
+              <Clock size={16} className="text-primary" aria-hidden />
+              {toFa(lesson.duration)} دقیقه
+            </span>
           )}
+          <span className="flex items-center gap-1.5">
+            <BookOpen size={16} className="text-accent" aria-hidden />
+            {chapter.title}
+          </span>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* ناحیه ویدیو                                 */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
+        {lesson.videoUrl ? (
+          <div className="aspect-video w-full">
+            <video
+              controls
+              className="h-full w-full bg-black"
+              src={lesson.videoUrl}
+            >
+              مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+            </video>
+          </div>
+        ) : (
+          <div className="flex aspect-video flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary-100 via-primary-50 to-secondary-light text-primary-light">
+            <PlayCircle size={48} aria-hidden />
+            <p className="text-sm font-bold">ویدیوی این درس به‌زودی بارگذاری می‌شود</p>
+          </div>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* محتوای متنی درس                             */}
+      {/* ═══════════════════════════════════════════ */}
+      {(lesson.content || lesson.description) && (
+        <div className="mt-8 rounded-card border border-line bg-surface p-6 shadow-card sm:p-8">
+          <h2 className="text-lg font-bold text-ink">خلاصه و نکات درس</h2>
+          <div className="mt-4 whitespace-pre-line text-base leading-8 text-ink-soft">
+            {lesson.content || lesson.description}
+          </div>
         </div>
       )}
 
-      {lesson.summary && lesson.summary.length > 0 && (
-        <div className="mt-8 rounded-lg border-2 border-primary-300 bg-primary-50 p-5">
-          <h3 className="font-bold text-primary-800">خلاصه درس</h3>
-          <ul className="mt-3 flex flex-col gap-2">
-            {lesson.summary.map((s, i) => (
-              <li key={i} className="text-sm leading-7 text-neutral-700">› <Highlight text={s} term={term} /></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.sources && lesson.sources.length > 0 && (
-        <div className="mt-8 rounded-lg border border-neutral-200 bg-neutral-50 p-5">
-          <h3 className="font-bold text-neutral-900">📚 منابع و مطالعه بیشتر</h3>
-          <ul className="mt-3 flex flex-col gap-3">
-            {lesson.sources.map((s, i) => (
-              <li key={i}>
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-                  {s.title}
-                </a>
-                <p className="mt-0.5 text-xs leading-6 text-neutral-500">{s.description}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {lesson.keywords && lesson.keywords.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {lesson.keywords.map((k) => (
-            <span key={k} className="rounded-full border border-primary-300 px-3 py-1 text-xs text-primary-700">#{k}</span>
-          ))}
-        </div>
-      )}
-
-      {/* یادداشت */}
-      <div className="mt-10">
-        <Card>
-          <CardBody>
-            <h3 className="flex items-center gap-2 font-bold text-neutral-900">
-              <StickyNote size={18} className="text-secondary-500" aria-hidden />
-              یادداشت من
-            </h3>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={4}
-              placeholder="یادداشت خود را درباره این درس بنویسید…"
-              className="mt-3 w-full rounded-lg border border-neutral-300 p-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100"
+      {/* ═══════════════════════════════════════════ */}
+      {/* ناوبری بین درس‌ها (قبلی / بعدی)            */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {prevLesson ? (
+          <Link
+            href={makeLessonHref(prevLesson.id)}
+            className="group flex items-center gap-3 rounded-card border border-line bg-surface p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-card-hover"
+          >
+            <ArrowRight
+              size={20}
+              className="shrink-0 text-ink-soft/40 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
+              aria-hidden
             />
-            <div className="mt-3 flex items-center gap-3">
-              <Button onClick={handleSaveNote} variant="secondary" size="sm">ذخیره یادداشت</Button>
-              {saved && <span className="text-sm text-accent-600">ذخیره شد ✓</span>}
+            <div className="min-w-0">
+              <p className="text-xs text-ink-soft">درس قبلی</p>
+              <p className="truncate text-sm font-bold text-ink group-hover:text-primary">
+                {prevLesson.title}
+              </p>
             </div>
-          </CardBody>
-        </Card>
+          </Link>
+        ) : (
+          <Link
+            href={chapterHref}
+            className="group flex items-center gap-3 rounded-card border border-line bg-surface p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-card-hover"
+          >
+            <ArrowRight
+              size={20}
+              className="shrink-0 text-ink-soft/40 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary"
+              aria-hidden
+            />
+            <div className="min-w-0">
+              <p className="text-xs text-ink-soft">بازگشت</p>
+              <p className="truncate text-sm font-bold text-ink group-hover:text-primary">
+                صفحه فصل {toFa(chapter.id)}
+              </p>
+            </div>
+          </Link>
+        )}
+
+        {nextLesson ? (
+          <Link
+            href={makeLessonHref(nextLesson.id)}
+            className="group flex items-center justify-end gap-3 rounded-card border border-line bg-surface p-5 text-left shadow-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-card-hover"
+          >
+            <div className="min-w-0 text-left">
+              <p className="text-xs text-ink-soft">درس بعدی</p>
+              <p className="truncate text-sm font-bold text-ink group-hover:text-primary">
+                {nextLesson.title}
+              </p>
+            </div>
+            <ArrowLeft
+              size={20}
+              className="shrink-0 text-ink-soft/40 transition-all duration-300 group-hover:-translate-x-1 group-hover:text-primary"
+              aria-hidden
+            />
+          </Link>
+        ) : (
+          <Link
+            href={chapterHref}
+            className="group flex items-center justify-end gap-3 rounded-card bg-accent/10 p-5 text-left transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-accent/20"
+          >
+            <div className="min-w-0 text-left">
+              <p className="text-xs text-accent-hover">پایان فصل</p>
+              <p className="flex items-center gap-1 truncate text-sm font-bold text-accent-hover">
+                <CheckCircle2 size={14} aria-hidden />
+                بازگشت به فصل {toFa(chapter.id)}
+              </p>
+            </div>
+            <ArrowLeft
+              size={20}
+              className="shrink-0 text-accent-hover"
+              aria-hidden
+            />
+          </Link>
+        )}
       </div>
 
-      {/* علامت خوانده‌شدن + ناوبری */}
-      <div className="mt-8 flex flex-col gap-4 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <Button onClick={handleDone} variant={done ? "primary" : "ghost"} size="sm" disabled={done}>
-          <CheckCircle2 size={16} aria-hidden />
-          {done ? "این درس مطالعه شد ✓" : "علامت به عنوان خوانده‌شده"}
-        </Button>
-        <div className="flex gap-3">
-          {prev && (
-            <Link href={`/courses/ai-for-lawyers/chapter/${chapter.id}/lesson/${prev.id}`} className="text-sm text-neutral-600 hover:text-primary-600">
-              → درس قبلی
-            </Link>
-          )}
-          {next && (
-            <Link href={`/courses/ai-for-lawyers/chapter/${chapter.id}/lesson/${next.id}`} className="flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700">
-              درس بعدی <ArrowLeft size={14} aria-hidden />
-            </Link>
-          )}
+      {/* ═══════════════════════════════════════════ */}
+      {/* لیست سریع درس‌های فصل                      */}
+      {/* ═══════════════════════════════════════════ */}
+      <div className="mt-10">
+        <h3 className="text-base font-bold text-ink">درس‌های این فصل</h3>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {chapter.lessons.map((l, i) => {
+            const isCurrent = String(l.id) === String(params.lessonId);
+            return (
+              <Link
+                key={l.id}
+                href={makeLessonHref(l.id)}
+                className={
+                  "flex items-center gap-3 rounded-btn border px-4 py-3 text-sm transition-all duration-300 ease-out " +
+                  (isCurrent
+                    ? "border-primary bg-primary/10 font-bold text-primary"
+                    : "border-line bg-surface text-ink-soft hover:border-primary-200 hover:text-primary")
+                }
+              >
+                <span
+                  className={
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold " +
+                    (isCurrent
+                      ? "bg-primary text-white"
+                      : "bg-base text-ink-soft")
+                  }
+                >
+                  {toFa(i + 1)}
+                </span>
+                <span className="truncate">{l.title}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

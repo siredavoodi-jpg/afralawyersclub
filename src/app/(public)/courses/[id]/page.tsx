@@ -9,31 +9,42 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-6 flex aspect-video items-center justify-center rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 text-primary-400">
-        تصویر دوره
+      {/* تصویر دوره */}
+      <div className="mb-8 flex aspect-video items-center justify-center rounded-card bg-gradient-to-br from-primary-100 via-primary-50 to-secondary-light text-primary-light">
+        <span className="text-lg font-bold">تصویر دوره</span>
       </div>
-      <h1 className="text-3xl font-bold text-neutral-900">{course.title}</h1>
-      <p className="mt-4 leading-relaxed text-neutral-600">{course.description}</p>
 
-      <div className="mt-6 flex flex-wrap gap-6 text-sm text-neutral-600">
+      <h1 className="text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
+        {course.title}
+      </h1>
+      <p className="mt-4 leading-relaxed text-ink-soft">{course.description}</p>
+
+      {/* اطلاعات دوره */}
+      <div className="mt-6 flex flex-wrap gap-6 text-sm text-ink-soft">
         <span className="flex items-center gap-1.5">
-          <Clock size={16} aria-hidden /> {Math.round(course.duration / 60)} ساعت
+          <Clock size={16} className="text-primary" aria-hidden />
+          {Math.round(course.duration / 60)} ساعت
         </span>
         {course.rating && (
           <span className="flex items-center gap-1.5">
-            <Star size={16} className="fill-secondary-500 text-secondary-500" aria-hidden /> {course.rating}
+            <Star size={16} className="fill-secondary text-secondary" aria-hidden />
+            {course.rating}
           </span>
         )}
         {course.studentsCount && (
           <span className="flex items-center gap-1.5">
-            <Users size={16} aria-hidden /> {course.studentsCount.toLocaleString("fa-IR")} دانشجو
+            <Users size={16} className="text-accent" aria-hidden />
+            {course.studentsCount.toLocaleString("fa-IR")} دانشجو
           </span>
         )}
       </div>
 
-      <div className="mt-8 flex items-center justify-between rounded-xl border border-neutral-100 p-6">
-        <span className="text-xl font-bold text-secondary-600">
-          {course.isFree ? "رایگان" : `${course.price.toLocaleString("fa-IR")} تومان`}
+      {/* قیمت و ثبت‌نام */}
+      <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-card border border-line bg-surface p-6 shadow-card sm:flex-row">
+        <span className="text-xl font-extrabold text-secondary">
+          {course.isFree
+            ? "رایگان"
+            : `${course.price.toLocaleString("fa-IR")} تومان`}
         </span>
         <ButtonLink href="/register" variant="secondary">
           ثبت‌نام در دوره
