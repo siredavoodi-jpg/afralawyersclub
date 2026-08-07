@@ -14,12 +14,21 @@ import { course } from "@/lib/course";
 const toFa = (n: number | string) =>
   String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
 
+// تایپ امن برای درس با فیلدهای اختیاری
+type LessonSafe = {
+  id: number | string;
+  title: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration?: number;
+};
+
 export default function LessonPage({
   params,
 }: {
   params: { chapterId: string; lessonId: string };
 }) {
-  // پیدا کردن فصل و درس (با مقایسه امن برای id عددی یا رشته‌ای)
   const chapter = course.chapters.find(
     (c) => String(c.id) === String(params.chapterId)
   );
@@ -30,19 +39,16 @@ export default function LessonPage({
   );
   if (lessonIndex === -1) return notFound();
 
-  const lesson = chapter.lessons[lessonIndex] as {
-    id: number | string;
-    title: string;
-    description?: string;
-    content?: string;
-    videoUrl?: string;
-    duration?: number;
-  };
+  // cast امن با as unknown as برای جلوگیری از خطای تایپ
+  const lesson = chapter.lessons[lessonIndex] as unknown as LessonSafe;
 
-  const prevLesson = lessonIndex > 0 ? chapter.lessons[lessonIndex - 1] : null;
+  const prevLesson =
+    lessonIndex > 0
+      ? (chapter.lessons[lessonIndex - 1] as unknown as LessonSafe)
+      : null;
   const nextLesson =
     lessonIndex < chapter.lessons.length - 1
-      ? chapter.lessons[lessonIndex + 1]
+      ? (chapter.lessons[lessonIndex + 1] as unknown as LessonSafe)
       : null;
 
   const chapterHref = `/courses/ai-for-lawyers/chapter/${chapter.id}`;
@@ -51,9 +57,7 @@ export default function LessonPage({
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* ═══════════════════════════════════════════ */}
-      {/* مسیر بازگشت (Breadcrumb)                    */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* مسیر بازگشت (Breadcrumb) */}
       <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
         <Link
           href="/courses/ai-for-lawyers"
@@ -72,9 +76,7 @@ export default function LessonPage({
         <span className="font-medium text-ink">درس {toFa(lessonIndex + 1)}</span>
       </nav>
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* هدر درس                                     */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* هدر درس */}
       <div className="mb-8">
         <span className="text-xs font-bold text-secondary">
           درس {toFa(lessonIndex + 1)} از {toFa(chapter.lessons.length)} · فصل{" "}
@@ -97,9 +99,7 @@ export default function LessonPage({
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* ناحیه ویدیو                                 */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* ناحیه ویدیو */}
       <div className="overflow-hidden rounded-card border border-line bg-surface shadow-card">
         {lesson.videoUrl ? (
           <div className="aspect-video w-full">
@@ -114,14 +114,14 @@ export default function LessonPage({
         ) : (
           <div className="flex aspect-video flex-col items-center justify-center gap-3 bg-gradient-to-br from-primary-100 via-primary-50 to-secondary-light text-primary-light">
             <PlayCircle size={48} aria-hidden />
-            <p className="text-sm font-bold">ویدیوی این درس به‌زودی بارگذاری می‌شود</p>
+            <p className="text-sm font-bold">
+              ویدیوی این درس به‌زودی بارگذاری می‌شود
+            </p>
           </div>
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* محتوای متنی درس                             */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* محتوای متنی درس */}
       {(lesson.content || lesson.description) && (
         <div className="mt-8 rounded-card border border-line bg-surface p-6 shadow-card sm:p-8">
           <h2 className="text-lg font-bold text-ink">خلاصه و نکات درس</h2>
@@ -131,9 +131,7 @@ export default function LessonPage({
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* ناوبری بین درس‌ها (قبلی / بعدی)            */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* ناوبری بین درس‌ها */}
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {prevLesson ? (
           <Link
@@ -200,27 +198,22 @@ export default function LessonPage({
                 بازگشت به فصل {toFa(chapter.id)}
               </p>
             </div>
-            <ArrowLeft
-              size={20}
-              className="shrink-0 text-accent-hover"
-              aria-hidden
-            />
+            <ArrowLeft size={20} className="shrink-0 text-accent-hover" aria-hidden />
           </Link>
         )}
       </div>
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* لیست سریع درس‌های فصل                      */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* لیست سریع درس‌های فصل */}
       <div className="mt-10">
         <h3 className="text-base font-bold text-ink">درس‌های این فصل</h3>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {chapter.lessons.map((l, i) => {
-            const isCurrent = String(l.id) === String(params.lessonId);
+            const ls = l as unknown as LessonSafe;
+            const isCurrent = String(ls.id) === String(params.lessonId);
             return (
               <Link
-                key={l.id}
-                href={makeLessonHref(l.id)}
+                key={ls.id}
+                href={makeLessonHref(ls.id)}
                 className={
                   "flex items-center gap-3 rounded-btn border px-4 py-3 text-sm transition-all duration-300 ease-out " +
                   (isCurrent
@@ -238,7 +231,7 @@ export default function LessonPage({
                 >
                   {toFa(i + 1)}
                 </span>
-                <span className="truncate">{l.title}</span>
+                <span className="truncate">{ls.title}</span>
               </Link>
             );
           })}
