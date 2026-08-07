@@ -19,16 +19,7 @@ export const metadata: Metadata = {
   title: "باشگاه وکلای افرا | هوش مصنوعی در خدمت جامعه وکالت",
   description:
     "داشبورد هوشمند، ابزارهای AI و دوره‌های تخصصی برای وکلا، کارآموزان و دانشجویان حقوق",
-  keywords: [
-    "هوش مصنوعی حقوقی",
-    "آموزش وکالت",
-    "داشبورد وکیل",
-    "باشگاه وکلای افرا",
-  ],
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
+  icons: { icon: "/icon.png", apple: "/apple-icon.png" },
 };
 
 export default function RootLayout({
@@ -41,7 +32,29 @@ export default function RootLayout({
       lang="fa"
       dir="rtl"
       className={`${vazirmatn.variable} ${inter.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* اسکریپت inline برای جلوگیری از flash of wrong theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('afra-theme') || 'system';
+                  var root = document.documentElement;
+                  var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (theme === 'norooz') {
+                    root.setAttribute('data-theme', 'norooz');
+                  } else if (isDark) {
+                    root.setAttribute('data-theme', 'dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="bg-base font-sans text-ink antialiased">
         {children}
       </body>

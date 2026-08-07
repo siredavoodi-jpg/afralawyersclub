@@ -3,39 +3,133 @@
 @tailwind utilities;
 
 @layer base {
+  /* ═══════════════════════════════════════════ */
+  /* Light Theme (پیش‌فرض)                       */
+  /* ═══════════════════════════════════════════ */
+  :root {
+    /* Primary - بنفش ارغوانی */
+    --color-primary-50: 245 230 255;     /* #F5E6FF */
+    --color-primary-100: 235 213 247;    /* #EBD5F7 */
+    --color-primary-200: 215 184 232;    /* #D7B8E8 */
+    --color-primary-300: 185 147 214;    /* #B993D6 */
+    --color-primary-400: 155 89 182;     /* #9B59B6 */
+    --color-primary-500: 125 60 152;     /* #7D3C98 */
+    --color-primary-600: 91 44 111;      /* #5B2C6F - اصلی */
+    --color-primary-700: 74 29 107;      /* #4A1D6B - تیره */
+    --color-primary-800: 61 21 96;
+    --color-primary-900: 46 15 78;
+
+    /* Secondary - نارنجی */
+    --color-secondary-50: 255 245 235;   /* #FFF5EB */
+    --color-secondary-100: 255 232 204;
+    --color-secondary-200: 255 209 153;
+    --color-secondary-300: 255 185 102;
+    --color-secondary-400: 255 161 51;
+    --color-secondary-500: 255 140 0;    /* #FF8C00 - اصلی */
+    --color-secondary-600: 230 126 0;    /* #E67E00 - hover */
+    --color-secondary-700: 204 111 0;
+
+    /* Accent - سبز */
+    --color-accent-50: 230 249 240;
+    --color-accent-100: 204 243 225;
+    --color-accent-200: 153 231 195;
+    --color-accent-300: 102 219 165;
+    --color-accent-400: 51 207 135;
+    --color-accent-500: 0 195 105;       /* #00C369 - اصلی */
+    --color-accent-600: 0 168 90;        /* hover */
+    --color-accent-700: 0 140 76;
+
+    /* Neutral */
+    --color-surface: 255 255 255;        /* #FFFFFF */
+    --color-base: 250 251 252;           /* #FAFBFC */
+    --color-ink: 26 26 46;               /* #1A1A2E */
+    --color-ink-soft: 74 85 104;         /* #4A5568 */
+    --color-line: 226 232 240;           /* #E2E8F0 */
+
+    /* Status */
+    --color-error: 220 38 38;
+    --color-success: 22 163 74;
+    --color-warning: 234 179 8;
+  }
+
+  /* ═══════════════════════════════════════════ */
+  /* Dark Theme                                   */
+  /* ═══════════════════════════════════════════ */
+  [data-theme="dark"] {
+    /* Primary - روشن‌تر برای خوانایی روی تیره */
+    --color-primary-50: 46 15 78;
+    --color-primary-100: 61 21 96;
+    --color-primary-200: 74 29 107;
+    --color-primary-300: 91 44 111;
+    --color-primary-400: 125 60 152;
+    --color-primary-500: 155 89 182;
+    --color-primary-600: 185 147 214;    /* اصلی در دارک */
+    --color-primary-700: 215 184 232;
+    --color-primary-800: 235 213 247;
+    --color-primary-900: 245 230 255;
+
+    /* Secondary */
+    --color-secondary-50: 60 30 0;
+    --color-secondary-100: 90 45 0;
+    --color-secondary-200: 120 60 0;
+    --color-secondary-300: 180 90 0;
+    --color-secondary-400: 230 126 0;
+    --color-secondary-500: 255 140 0;
+    --color-secondary-600: 255 165 40;
+    --color-secondary-700: 255 185 80;
+
+    /* Accent */
+    --color-accent-50: 0 30 20;
+    --color-accent-100: 0 50 35;
+    --color-accent-200: 0 80 55;
+    --color-accent-300: 0 120 80;
+    --color-accent-400: 0 168 90;
+    --color-accent-500: 0 230 130;
+    --color-accent-600: 80 240 160;
+    --color-accent-700: 140 250 190;
+
+    /* Neutral - پس‌زمینه تیره */
+    --color-surface: 26 26 46;           /* #1A1A2E */
+    --color-base: 18 18 32;              /* #121220 */
+    --color-ink: 245 245 250;            /* #F5F5FA */
+    --color-ink-soft: 180 185 200;       /* #B4B9C8 */
+    --color-line: 55 60 80;              /* #373C50 */
+  }
+
+  /* ═══════════════════════════════════════════ */
+  /* Norooz Theme (تم نوروزی - نمونه)             */
+  /* ═══════════════════════════════════════════ */
+  [data-theme="norooz"] {
+    --color-primary-600: 34 139 34;      /* سبز بهاری */
+    --color-secondary-500: 220 20 60;    /* قرمز سنتی */
+    --color-accent-500: 255 215 0;       /* طلایی */
+  }
+
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-white text-neutral-900 antialiased;
+    @apply bg-base text-ink antialiased;
     font-family: var(--font-vazirmatn), "Vazirmatn", Tahoma, Arial, sans-serif;
     line-height: 1.75;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* فشرده‌سازی فاصله حروف در عناوین طبق دستور طراحی */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     letter-spacing: -0.01em;
   }
 }
 
 @layer utilities {
-  /* تعریف کلاس font-fa برای سازگاری با کدهای موجود */
   .font-fa {
     font-family: var(--font-vazirmatn), "Vazirmatn", Tahoma, Arial, sans-serif;
   }
 
-  /* کلاس transition-fast برای سازگاری با کدهای موجود */
   .transition-fast {
     transition: all 150ms ease-out;
   }
 
-  /* فونت انگلیسی برای اعداد و متون لاتین */
   .font-en {
     font-family: var(--font-inter), "Inter", Arial, sans-serif;
   }

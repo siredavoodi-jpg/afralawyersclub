@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Menu, X, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { getAuthUser, type AuthUser } from "@/lib/auth-client";
 
 const navLinks = [
@@ -31,9 +32,9 @@ export function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/90 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        {/* لوگو بزرگ‌تر طبق دستور طراحی */}
+        {/* لوگو */}
         <Link
           href="/"
           className="flex items-center gap-3"
@@ -75,8 +76,9 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* دکمه‌های دسکتاپ */}
+        {/* دکمه‌های دسکتاپ + Theme Toggle */}
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle />
           {user ? (
             <ButtonLink
               href={dashboardHref(user.role)}
@@ -97,20 +99,23 @@ export function Navbar() {
           )}
         </div>
 
-        {/* دکمه منوی موبایل */}
-        <button
-          className="rounded-lg p-2 text-ink-soft transition-colors hover:bg-primary-50 hover:text-primary lg:hidden"
-          aria-label={open ? "بستن منو" : "باز کردن منو"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Theme + Hamburger در موبایل */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle className="scale-90" />
+          <button
+            className="rounded-lg p-2 text-ink-soft transition-colors hover:bg-primary-50 hover:text-primary"
+            aria-label={open ? "بستن منو" : "باز کردن منو"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </nav>
 
       {/* منوی موبایل */}
       {open && (
-        <div className="border-t border-line bg-white px-4 py-4 shadow-lg lg:hidden">
+        <div className="border-t border-line bg-surface px-4 py-4 shadow-lg lg:hidden">
           <ul className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <li key={link.href}>
