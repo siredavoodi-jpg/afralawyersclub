@@ -45,7 +45,7 @@ const memberLinks: NavItem[] = [
   { href: "/dashboard/downloads", label: "دانلودها", icon: Download },
   { href: "/dashboard/notifications", label: "اعلان‌ها", icon: Bell, badge: "۲" },
   { href: "/dashboard/subscription", label: "اشتراک", icon: CreditCard },
-  { href: "/dashboard/feedback", label: "بازخورد", icon: MessageSquare },
+{ href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: MessageSquare },
   { href: "/dashboard/profile", label: "پروفایل", icon: UserCircle },
 ];
 
@@ -55,6 +55,7 @@ const lawyerLinks: NavItem[] = [
     href: "/lawyer/cases",
     label: "پرونده‌ها و موکلین",
     icon: Briefcase,
+{ href: "/dashboard/feedback", label: "نظرات و امتیازها", icon: MessageSquare },
   },
   {
     href: "/lawyer/ai/tools",
