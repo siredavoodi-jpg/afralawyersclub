@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  Star,
   InboxIcon,
   Loader2,
   Filter,
@@ -27,9 +26,9 @@ interface Review {
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   reviewedAt: string | null;
+  courseId: string | null;
   user: { id: string; name: string; phone: string; role: string };
-  courseId: string | null;  
-reviewer: { name: string } | null;
+  reviewer: { name: string } | null;
 }
 
 type StatusFilter = "pending" | "approved" | "rejected" | "all";
@@ -39,6 +38,12 @@ const statusConfig = {
   pending: { label: "در انتظار", tone: "secondary" as const, icon: Clock },
   approved: { label: "تایید شده", tone: "accent" as const, icon: CheckCircle2 },
   rejected: { label: "رد شده", tone: "neutral" as const, icon: XCircle },
+};
+
+// نام فارسی دوره‌های استاتیک (با افزودن هر دوره جدید، یک خط اضافه کنید)
+const courseTitles: Record<string, string> = {
+  "ai-for-lawyers": "آموزش مقدمات هوش مصنوعی",
+  c3: "نکات مهم در تخلفات قرارداد الکترونیک وکالت",
 };
 
 export default function AdminReviewsPage() {
@@ -216,10 +221,10 @@ export default function AdminReviewsPage() {
                       <span className="text-xs text-ink-soft">
                         ({r.rating} از ۵)
                       </span>
-                      {r.course ? (
+                      {r.courseId ? (
                         <Badge tone="primary">
                           <Eye size={10} />
-                          دوره: {r.course.title}
+                          دوره: {courseTitles[r.courseId] || r.courseId}
                         </Badge>
                       ) : (
                         <Badge tone="neutral">نظر کلی سایت</Badge>
@@ -235,7 +240,7 @@ export default function AdminReviewsPage() {
                     </p>
 
                     {/* دکمه‌های عملیات */}
-                    {r.status === "pending" && (
+                    {r.status === "pending" ? (
                       <div className="flex flex-wrap gap-2 border-t border-line pt-3">
                         <Button
                           size="sm"
@@ -260,8 +265,7 @@ export default function AdminReviewsPage() {
                           رد
                         </Button>
                       </div>
-                    )}
-                    {r.status !== "pending" && (
+                    ) : (
                       <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
                         {r.status === "rejected" && (
                           <Button
