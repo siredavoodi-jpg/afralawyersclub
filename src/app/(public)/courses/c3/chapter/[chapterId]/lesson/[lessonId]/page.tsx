@@ -1,0 +1,178 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import {
+  ArrowRight,
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Target,
+  FileText,
+} from "lucide-react";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { getECChapter, getECLesson } from "@/lib/courses/electronic-contract";
+import { LessonContent } from "./LessonContent";
+
+export default function ECLessonPage({
+  params,
+}: {
+  params: { chapterId: string; lessonId: string };
+}) {
+  const chapterId = Number(params.chapterId);
+  const lessonId = Number(params.lessonId);
+
+  const chapter = getECChapter(chapterId);
+  if (!chapter) notFound();
+
+  const lesson = getECLesson(chapterId, lessonId);
+  if (!lesson) notFound();
+
+  const lessonIndex = chapter.lessons.findIndex((l) => l.id === lessonId);
+  const prevLesson = lessonIndex > 0 ? chapter.lessons[lessonIndex - 1] : null;
+  const nextLesson =
+    lessonIndex < chapter.lessons.length - 1
+      ? chapter.lessons[lessonIndex + 1]
+      : null;
+
+  const totalLessons = chapter.lessons.length;
+  const progressPercent = Math.round(((lessonIndex + 1) / totalLessons) * 100);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-surface to-secondary/5">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
+          <Link
+            href="/courses/c3"
+            className="transition-colors hover:text-primary"
+          >
+            نکات مهم در تخلفات قرارداد الکترونیک وکالت
+          </Link>
+          <ArrowLeft size={14} className="rotate-180" />
+          <Link
+            href={`/courses/c3/chapter/${chapter.id}`}
+            className="transition-colors hover:text-primary"
+          >
+            {chapter.title}
+          </Link>
+          <ArrowLeft size={14} className="rotate-180" />
+          <span className="font-medium text-ink">درس {lesson.id}</span>
+        </nav>
+
+        {/* Progress Bar */}
+        <Card hover={false} className="mb-6">
+          <CardBody className="p-4">
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="font-medium text-ink-soft">پیشرفت فصل</span>
+              <span className="font-bold text-primary">
+                {progressPercent}%
+              </span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-base">
+              <div
+                className="h-full rounded-full bg-gradient-to-l from-primary to-secondary transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-ink-soft">
+              درس {lesson.id} از {totalLessons} درس این فصل
+            </p>
+          </CardBody>
+        </Card>
+
+        {/* Header */}
+        <Card hover={false} className="mb-8">
+          <CardBody className="p-8">
+            <div className="flex items-start gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-white">
+                <BookOpen size={32} />
+              </div>
+              <div className="flex-1">
+                <Badge tone="primary" className="mb-2">
+                  {lesson.difficulty}
+                </Badge>
+                <h1 className="mb-2 text-2xl font-bold text-ink sm:text-3xl">
+                  {lesson.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-ink-soft">
+                  <span className="flex items-center gap-1.5">
+                    <Clock size={16} />
+                    {lesson.readingTime}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Target size={16} />
+                    {lesson.objectives.length} هدف یادگیری
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <FileText size={16} />
+                    {lesson.sections.length} بخش
+                  </span>
+                </div>
+                <p className="mt-3 text-sm text-ink-soft">
+                  مدرس: <span className="font-bold text-ink">همکار وکیل، آقای محمد اشرافی زاوه</span>
+                </p>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* محتوای اصلی درس */}
+        <LessonContent lesson={lesson} courseSlug="c3" />
+
+        {/* Navigation */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {prevLesson ? (
+            <Link href={`/courses/c3/chapter/${chapter.id}/lesson/${prevLesson.id}`}>
+              <Card className="group h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+                <CardBody className="flex items-center gap-3 p-4">
+                  <ArrowRight
+                    size={20}
+                    className="text-primary transition-transform group-hover:-translate-x-1"
+                  />
+                  <div className="flex-1">
+                    <p className="text-xs text-ink-soft">درس قبلی</p>
+                    <p className="font-medium text-ink">{prevLesson.title}</p>
+                  </div>
+                </CardBody>
+              </Card>
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          {nextLesson ? (
+            <Link href={`/courses/c3/chapter/${chapter.id}/lesson/${nextLesson.id}`}>
+              <Card className="group h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+                <CardBody className="flex items-center gap-3 p-4">
+                  <div className="flex-1 text-left">
+                    <p className="text-xs text-ink-soft">درس بعدی</p>
+                    <p className="font-medium text-ink">{nextLesson.title}</p>
+                  </div>
+                  <ArrowLeft
+                    size={20}
+                    className="text-primary transition-transform group-hover:translate-x-1"
+                  />
+                </CardBody>
+              </Card>
+            </Link>
+          ) : (
+            <Link href={`/courses/c3/chapter/${chapter.id}`}>
+              <Card className="group h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+                <CardBody className="flex items-center gap-3 p-4">
+                  <div className="flex-1 text-left">
+                    <p className="text-xs text-ink-soft">پایان دوره 🎉</p>
+                    <p className="font-medium text-ink">
+                      بازگشت به فهرست فصل
+                    </p>
+                  </div>
+                  <CheckCircle2 size={20} className="text-accent" />
+                </CardBody>
+              </Card>
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
