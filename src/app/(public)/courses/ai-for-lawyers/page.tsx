@@ -1,3 +1,4 @@
+import { CourseReviews } from "@/components/reviews/CourseReviews";
 import Image from "next/image";
 import Link from "next/link";
 import { Lock, BookOpen, Users } from "lucide-react";
@@ -143,6 +144,8 @@ export default function CourseLandingPage() {
           })}
         </div>
       </section>
+      {/* نظرات دوره */}
+      <CourseReviews courseId="ai-for-lawyers" />
     </>
   );
 }

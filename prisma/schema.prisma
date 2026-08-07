@@ -159,7 +159,7 @@ model Course {
   createdAt   DateTime     @default(now()) @map("created_at")
   lessons     Lesson[]
   enrollments Enrollment[]
-  reviews   Review[]
+  
 
   @@map("courses")
 }
@@ -282,7 +282,7 @@ model MarketListingImage {
 model Review {
   id         String       @id @default(uuid())
   userId     String       @map("user_id")
-  courseId   String?      @map("course_id") // null = نظر کلی سایت
+  courseId   String?      @map("course_id") // شناسه دوره (استاتیک یا دیتابیس) - بدون foreign key
   rating     Int          // 1 تا 5
   title      String?      // عنوان اختیاری (برای دوره‌ها مفید است)
   content    String       // متن نظر
@@ -293,7 +293,7 @@ model Review {
   updatedAt  DateTime     @updatedAt @map("updated_at")
 
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
   reviewer User?   @relation("ReviewApprovals", fields: [reviewedBy], references: [id], onDelete: SetNull)
 
   @@index([courseId, status])

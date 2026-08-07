@@ -1,3 +1,4 @@
+import { CourseReviews } from "@/components/reviews/CourseReviews";
 import Link from "next/link";
 import {
   Scale,
@@ -236,6 +237,7 @@ export default function C3CoursePage() {
           ))}
         </div>
       </section>
+      <CourseReviews courseId="c3" />
     </>
   );
 }

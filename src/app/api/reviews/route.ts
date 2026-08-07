@@ -26,19 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // اگر courseId داده شده، بررسی وجود دوره
-    if (courseId) {
-      const course = await prisma.course.findUnique({
-        where: { id: courseId },
-      });
-      if (!course) {
-        return NextResponse.json(
-          { error: "دوره مورد نظر یافت نشد." },
-          { status: 404 }
-        );
-      }
-    }
-
+ 
     // جلوگیری از ثبت نظر تکراری برای یک دوره توسط یک کاربر
     if (courseId) {
       const existing = await prisma.review.findFirst({
