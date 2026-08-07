@@ -14,6 +14,16 @@ import { ButtonLink } from "@/components/ui/Button";
 const toFa = (n: number | string) =>
   String(n).replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
 
+// تایپ امن برای درس با فیلدهای اختیاری
+type LessonSafe = {
+  id: number | string;
+  title: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration?: number;
+};
+
 export default function ChapterPage({
   params,
 }: {
@@ -22,19 +32,15 @@ export default function ChapterPage({
   const chapterId = Number(params.chapterId);
   const chapter = course.chapters.find((c) => c.id === chapterId);
 
-  // اگر فصل وجود نداشت یا غیرفعال بود
   if (!chapter || !chapter.isActive) return notFound();
 
   const chapterIndex = course.chapters.findIndex((c) => c.id === chapterId);
 
   return (
     <>
-      {/* ═══════════════════════════════════════════ */}
-      {/* هدر فصل                                     */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* هدر فصل */}
       <section className="bg-hero-gradient py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          {/* دکمه بازگشت */}
           <Link
             href="/courses/ai-for-lawyers"
             className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary-dark"
@@ -63,7 +69,6 @@ export default function ChapterPage({
             </p>
           )}
 
-          {/* آمار فصل */}
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-ink-soft">
             <span className="flex items-center gap-1.5">
               <BookOpen size={16} className="text-primary" aria-hidden />
@@ -83,14 +88,13 @@ export default function ChapterPage({
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════ */}
-      {/* لیست درس‌های فصل                           */}
-      {/* ═══════════════════════════════════════════ */}
+      {/* لیست درس‌های فصل */}
       <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h2 className="text-xl font-bold text-ink">درس‌های این فصل</h2>
 
         <div className="mt-6 flex flex-col gap-3">
-          {chapter.lessons.map((lesson, i) => {
+          {chapter.lessons.map((l, i) => {
+            const lesson = l as unknown as LessonSafe;
             const lessonHref = `/courses/ai-for-lawyers/chapter/${chapter.id}/lesson/${lesson.id}`;
             return (
               <Link
