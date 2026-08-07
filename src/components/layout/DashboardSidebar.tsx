@@ -96,10 +96,10 @@ const lawyerLinks: NavItem[] = [
 const adminLinks: NavItem[] = [
   { href: "/admin/lawyers", label: "مدیریت وکلا", icon: Users },
   { href: "/admin/trainees", label: "مدیریت کارآموزان", icon: UserCheck },
+  { href: "/admin/reviews", label: "مدیریت نظرات", icon: MessageSquare }, // 🆕 این خط را اضافه کنید
   { href: "/lawyer/dashboard", label: "نمای وکیل", icon: LayoutDashboard },
   { href: "/dashboard", label: "نمای کاربر", icon: UserCircle },
 ];
-
 const linkMap: Record<SidebarVariant, NavItem[]> = {
   member: memberLinks,
   lawyer: lawyerLinks,

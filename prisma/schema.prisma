@@ -80,6 +80,12 @@ enum Gender {
   female
 }
 
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+}
+
 model User {
   id                   String           @id @default(uuid())
   phone                String           @unique
@@ -105,6 +111,8 @@ model User {
   aiRequests           AiRequest[]
   enrollments          Enrollment[]
   otpCodes             OtpCode[]
+  reviews          Review[]          // نظراتی که کاربر نوشته
+  reviewedReviews  Review[]          @relation("ReviewApprovals") // نظراتی که ادمین تایید کرده
 
   @@map("users")
 }
@@ -151,6 +159,7 @@ model Course {
   createdAt   DateTime     @default(now()) @map("created_at")
   lessons     Lesson[]
   enrollments Enrollment[]
+  reviews   Review[]
 
   @@map("courses")
 }
@@ -264,4 +273,31 @@ model MarketListingImage {
   sortOrder Int           @default(0)
   listingId String
   listing   MarketListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// سیستم نظرات و امتیازدهی (Reviews & Ratings)
+// ─────────────────────────────────────────────
+
+model Review {
+  id         String       @id @default(uuid())
+  userId     String       @map("user_id")
+  courseId   String?      @map("course_id") // null = نظر کلی سایت
+  rating     Int          // 1 تا 5
+  title      String?      // عنوان اختیاری (برای دوره‌ها مفید است)
+  content    String       // متن نظر
+  status     ReviewStatus @default(pending)
+  reviewedBy String?      @map("reviewed_by") // شناسه ادمین تاییدکننده
+  reviewedAt DateTime?    @map("reviewed_at")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  reviewer User?   @relation("ReviewApprovals", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([courseId, status])
+  @@index([userId])
+  @@index([status])
+  @@map("reviews")
 }
